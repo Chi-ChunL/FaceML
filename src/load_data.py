@@ -57,7 +57,7 @@ for index, axis in enumerate(axes.flat):
     axis.axis("off")
 
 figure.suptitle("FER-2013 training examples", fontsize=16)
-plt.tight_layout()
+plt.tight_layout(rect=(0, 0, 1, 0.96))
 output_path = RESULTS_DIRECTORY / "training_examples.png"
 
 figure.savefig(output_path, dpi=150, bbox_inches="tight")
