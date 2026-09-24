@@ -1,7 +1,14 @@
 import tensorflow as tf
+from pathlib import Path
 
 IMAGE_SHAPE = (48, 48, 1)
 NUMBER_OF_CLASSES = 7
+BATCH_SIZE = 32
+VALIDATION_SPLIT = 0.20
+RANDOM_SEED = 42
+
+PROJECT_ROOT = Path(__file__).resolve.parents[1]
+TRAIN_DIRECTORY = PROJECT_ROOT / "data" / "fer2013" / "train"
 
 #allow tensorflow to acqurire gpu gradually in here as well
 
@@ -9,6 +16,7 @@ gpus = tf.config.list_physical_devices("GPU")
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
+#sets up the model
 model = tf.keras.Sequential(
     [
         tf.keras.layers.Input(shape=IMAGE_SHAPE, name="face_image"),
@@ -25,6 +33,13 @@ model = tf.keras.Sequential(
         tf.keras.layers.Dense(units=NUMBER_OF_CLASSES, activation="softmax", name="expression_probabilities")
     ],
     name="baseline_cnn",
+)
+
+#compiles the actual model
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    metrics=["accuracy"],
 )
 
 model.summary()
