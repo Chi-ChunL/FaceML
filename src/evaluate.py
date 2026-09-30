@@ -4,6 +4,7 @@ from load_data import create_test_dataset
 import numpy as np
 from sklearn.metrics import classification_report, ConfusionMatrixDisplay, confusion_matrix
 import matplotlib.pyplot as plt
+import json
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = PROJECT_ROOT / "models" / "baseline_best.keras"
@@ -42,8 +43,31 @@ def main():
     print("\nClassification report:")
     print(report)
 
+    report_data = classification_report(true_labels, predicted_labels, target_names=class_names, digits=4, zero_division=0, output_dict=True)
+
     raw_confusion_matrix = confusion_matrix(true_labels, predicted_labels)
     normalised_confusion_matrix = confusion_matrix(true_labels, predicted_labels, normalize="true")
+
+    metrics = {
+        "model": "baseline",
+        "model_path": str(MODEL_PATH.relative_to(PROJECT_ROOT)),
+        "parameter_count": model.count_params(),
+        "model_size_bytes": MODEL_PATH.stat().st_size,
+        "test_loss": float(test_loss),
+        "test_accuracy": float(test_accuracy),
+        "macro_f1": float(report_data["macro avg"]["f1-score"]),
+        "weighted_f1": float(report_data["weighted avg"]["f1-score"]),
+        "class_names": class_names,
+        "classification_report": report_data,
+        "confusion_matrix_counts": raw_confusion_matrix.tolist(),
+        "confusion_matrix_normalised": normalised_confusion_matrix.tolist(),
+    }
+
+    metrics_path = RESULTS_DIRECTORY / "baseline_metrics.json"
+
+    with metrics_path.open("w", encoding="utf-8") as metrics_file:
+        json.dump(metrics, metrics_file, indent=4)
+    print(f"Baseline metrics saved to: {metrics_path}")
 
     figure, axes = plt.subplots(1, 2, figsize=(16, 7))
     raw_display = ConfusionMatrixDisplay(confusion_matrix=raw_confusion_matrix, display_labels=class_names)
