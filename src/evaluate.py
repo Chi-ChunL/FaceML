@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import json
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MODEL_PATH = PROJECT_ROOT / "models" / "baseline_best.keras"
+EXPERIMENT_NAME = "improved"
+MODEL_PATH = PROJECT_ROOT / "models" / f"{EXPERIMENT_NAME}_best.keras"
 RESULTS_DIRECTORY = PROJECT_ROOT / "results"
 RESULTS_DIRECTORY.mkdir(exist_ok=True)
 
@@ -23,7 +24,7 @@ def main():
     class_names = test_dataset.class_names
 
     test_dataset = test_dataset.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
-    print("\nLoading the baseline model...")
+    print(f"\nLoading the {EXPERIMENT_NAME} model...")
     model = tf.keras.models.load_model(MODEL_PATH)
     print("Class names:", class_names)
     print("evaluating...")
@@ -49,7 +50,7 @@ def main():
     normalised_confusion_matrix = confusion_matrix(true_labels, predicted_labels, normalize="true")
 
     metrics = {
-        "model": "baseline",
+        "model": EXPERIMENT_NAME,
         "model_path": str(MODEL_PATH.relative_to(PROJECT_ROOT)),
         "parameter_count": model.count_params(),
         "model_size_bytes": MODEL_PATH.stat().st_size,
@@ -63,23 +64,23 @@ def main():
         "confusion_matrix_normalised": normalised_confusion_matrix.tolist(),
     }
 
-    metrics_path = RESULTS_DIRECTORY / "baseline_metrics.json"
+    metrics_path = RESULTS_DIRECTORY / f"{EXPERIMENT_NAME}_metrics.json"
 
     with metrics_path.open("w", encoding="utf-8") as metrics_file:
         json.dump(metrics, metrics_file, indent=4)
-    print(f"Baseline metrics saved to: {metrics_path}")
+    print(f"{EXPERIMENT_NAME.capitalize()} metrics saved to: {metrics_path}")
 
     figure, axes = plt.subplots(1, 2, figsize=(16, 7))
     raw_display = ConfusionMatrixDisplay(confusion_matrix=raw_confusion_matrix, display_labels=class_names)
     raw_display.plot(ax=axes[0], cmap="Blues", values_format="d", colorbar=False)
-    axes[0].set_title("Baseline confusion matrix - counts")
+    axes[0].set_title(f"{EXPERIMENT_NAME.capitalize()} confusion matrix - counts")
     normalised_display = ConfusionMatrixDisplay(confusion_matrix=normalised_confusion_matrix, display_labels=class_names)
     normalised_display.plot(ax=axes[1], cmap="Blues", values_format=".2f", colorbar=False)
-    axes[1].set_title("Baseline confusion matrix - row-normalised")
+    axes[1].set_title(f"{EXPERIMENT_NAME.capitalize()} confusion matrix - row-normalised")
     for axis in axes:
         plt.setp(axis.get_xticklabels(), rotation=45, ha="right")
     figure.tight_layout()
-    confusion_matrix_path = RESULTS_DIRECTORY / "baseline_confusion_matrices.png"
+    confusion_matrix_path = RESULTS_DIRECTORY / f"{EXPERIMENT_NAME}_confusion_matrices.png"
     figure.savefig(confusion_matrix_path, dpi=150, bbox_inches="tight")
     plt.close(figure)
     print(f"\nConfusion matrices saved to: "

@@ -37,7 +37,21 @@ data_augmentation = tf.keras.Sequential(
 train_dataset, validation_dataset = create_training_datasets()
 
 class_names = train_dataset.class_names
-class_count = {index}
+class_counts = {index: 0 for index in range(NUMBER_OF_CLASSES)}
+for image_path in train_dataset.file_paths:
+    class_name = Path(image_path).parent.name
+    class_index = class_names.index(class_name)
+    class_counts[class_index] += 1
+total_images = sum(class_counts.values())
+class_weights = {index: total_images / (NUMBER_OF_CLASSES * count) for index, count in class_counts.items()}
+print("\nTraining class weights:")
+for index, class_name in enumerate(class_names):
+    print(
+        f"{class_name:>8}: "
+        f"count={class_counts[index]}, "
+        f"weight={class_weights[index]:.3f}"
+    )
+
 
 def augment_batch(images, labels):
     augmented_images = data_augmentation(images, training=True)
@@ -114,7 +128,7 @@ callbacks = [
 ]
 
 print("\nTraining the improved CNN")
-history = model.fit(train_dataset, validation_data=validation_dataset, epochs=EPOCHS, callbacks=callbacks)
+history = model.fit(train_dataset, validation_data=validation_dataset, epochs=EPOCHS, callbacks=callbacks, class_weight=class_weights)
 
 validation_loss, validation_accuracy = model.evaluate(validation_dataset, verbose=0)
 print(f"\nbest validation loss: {validation_loss:.4f}")

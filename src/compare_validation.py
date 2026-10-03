@@ -14,8 +14,8 @@ class_names = validation_dataset.class_names
 
 validation_dataset = validation_dataset.cache()
 true_labels = np.concatenate([labels.numpy() for images, labels in validation_dataset ])
-
-model_files = ["baseline_best.keras", "baseline_augmented_best.keras", "improved_best.keras"]
+#repeated outputing the data so I can have a comparison
+model_files = ["baseline_best.keras", "baseline_augmented_best.keras", "improved_best.keras", "improved_weighted_best.keras"]
 for filename in model_files:
     model_path = PROJECT_ROOT / "models" / filename
     model = tf.keras.models.load_model(model_path)
@@ -28,3 +28,5 @@ for filename in model_files:
     print(classification_report(true_labels, predicted_labels, labels=list(range(len(class_names))), target_names=class_names, digits=4, zero_division=0))
 del model
 tf.keras.backend.clear_session()
+
+
