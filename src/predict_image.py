@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = PROJECT_ROOT / "models" / "improved_best.keras"
-
+#parser thro
 parser = argparse.ArgumentParser()
 parser.add_argument("image_path", type=Path)
 args = parser.parse_args()
