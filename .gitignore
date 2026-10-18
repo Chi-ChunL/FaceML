@@ -6,3 +6,4 @@ models/checkpoints/
 website/node_modules/
 website/dist/
 data/expw_raw/
+data/expw_prepared/
