@@ -19,13 +19,11 @@ RESULTS_DIRECTORY = PROJECT_ROOT / "results" / "gradcam"
 
 
 def make_gradcam(image_batch, model, target_index=None):
-    """Return a normalised heatmap and the seven expression probabilities."""
     output_layer = model.layers[-1]
     last_convolution = model.get_layer("last_convolution")
 
     with tf.GradientTape() as tape:
-        # Trace a single forward pass through this Sequential model. This avoids
-        # disconnected symbolic outputs in some saved Keras Sequential models.
+        #trace a single forward pass through this Sequential model. 
         dense_inputs = image_batch
         for layer in model.layers[:-1]:
             dense_inputs = layer(dense_inputs, training=False)
@@ -33,8 +31,7 @@ def make_gradcam(image_batch, model, target_index=None):
                 feature_maps = dense_inputs
                 tape.watch(feature_maps)
 
-        # Use scores before softmax to avoid its saturation at high confidence.
-        # This reuses the output layer's weights without changing the model.
+        #use scores before softmax to avoid its saturation at high confidence.
         logits = tf.linalg.matmul(dense_inputs, output_layer.kernel)
         if output_layer.use_bias:
             logits = logits + output_layer.bias
@@ -47,11 +44,11 @@ def make_gradcam(image_batch, model, target_index=None):
     if gradients is None:
         raise ValueError("The class score is not connected to the feature maps.")
 
-    # Average spatial gradients to obtain one importance weight per feature map.
+    #average spatial gradients to obtain one importance weight per feature map.
     channel_weights = tf.reduce_mean(gradients, axis=(0, 1, 2))
     heatmap = tf.reduce_sum(feature_maps[0] * channel_weights, axis=-1)
 
-    # Keep positive contributions and scale to 0-1, including an all-zero case.
+    #keep positive contributions and scale to 0-1, including an all-zero case.
     heatmap = tf.nn.relu(heatmap)
     heatmap = tf.math.divide_no_nan(heatmap, tf.reduce_max(heatmap))
     probabilities = tf.nn.softmax(logits, axis=-1)[0]
@@ -86,8 +83,6 @@ def main():
     )
     image_array = tf.keras.utils.img_to_array(image)
     image_batch = tf.expand_dims(image_array, axis=0)
-    # Keep pixels in 0-255: the saved model already contains rescaling.
-
     target_index = None
     if args.class_name is not None:
         target_index = EXPECTED_CLASS_NAMES.index(args.class_name)
