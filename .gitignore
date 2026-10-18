@@ -7,3 +7,4 @@ website/node_modules/
 website/dist/
 data/expw_raw/
 data/expw_prepared/
+website/public/models/transfer-probe/
