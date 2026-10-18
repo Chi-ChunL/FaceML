@@ -1,5 +1,6 @@
 import tensorflow as tf
 from pathlib import Path
+from load_data import create_training_datasets
 
 tf.keras.utils.set_random_seed(42)
 
@@ -46,25 +47,34 @@ print("Predicition shape:", predictions.shape)
 print("Probability sum:", tf.reduce_sum(predictions).numpy())
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-EXPORT_DIRECTORY = (
-    PROJECT_ROOT
-    / "models"
-    / "checkpoints"
-    / "transfer_probe_saved_model"
+
+WARMUP_MODEL_PATH = (PROJECT_ROOT / "models" / "checkpoints" / "transfer_warmup_best.keras")
+RESULT_DIRECTORY = PROJECT_ROOT / "results"
+
+WARMUP_MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+RESULT_DIRECTORY.mkdir(exist_ok=True)
+
+train_dataset, validation_dataset = create_training_datasets()
+
+train_dataset = train_dataset.prefetch(tf.data.AUTOTUNE)
+validation_dataset = validation_dataset.cache().prefetch(tf.data.AUTOTUNE)
+
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    metrics=["accuracy"],
 )
 
-EXPORT_DIRECTORY.parent.mkdir(parents=True, exist_ok=True)
+callbacks = [tf.keras.callbacks.ModelCheckpoint(
+    filepath=WARMUP_MODEL_PATH,
+    monitor="val_loss",
+    save_best_only=True,
+    verbose=1,
+    ),
+    tf.keras.callbacks.CSVLogger(str(RESULT_DIRECTORY / "transfer_warmup_history.csv")),
+]
 
-model.export(
-    EXPORT_DIRECTORY,
-    input_signature=[
-        tf.TensorSpec(
-            shape=(None, 48, 48, 1),
-            dtype=tf.float32,
-            name="face_image",
-        )
-    ],
-    verbose=False,
-)
 
-print("Prototype exported to:", EXPORT_DIRECTORY)
+history = model.fit(train_dataset, validation_data=validation_dataset, epochs=5, callbacks=callbacks)
+
+print("best warmup model saved to:", WARMUP_MODEL_PATH)
