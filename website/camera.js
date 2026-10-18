@@ -1,3 +1,6 @@
+import * as tf from "@tensorflow/tfjs";
+import {load as loadFaceDetector} from "@tensorflow-models/face-detection/dist/tfjs/detector.js";
+
 const video = document.querySelector("#webcam");
 const startButton = document.querySelector("#start-camera");
 const stopButton = document.querySelector("#stop-camera");
@@ -8,6 +11,7 @@ const overlayContext = overlay.getContext("2d");
 let stream = null;
 let detector = null;
 let detectionBusy = false;
+let detectionTimer = null;
 
 function stopCamera() {
     window.clearInterval(detectionTimer);
@@ -33,7 +37,7 @@ async function startCamera() {
             cameraStatus.textContent = "Loading the face detector...";
             await tf.ready();
 
-            detector = await faceDetection.createDetector(faceDetection.SupportedModels.MediaPipeFaceDetector,
+            detector = await loadFaceDetector(
                 {
                     runtime: "tfjs",
                     modelType: "short",
@@ -93,6 +97,14 @@ async function detectFace() {
         overlayContext.lineWidth = 3;
         overlayContext.strokeRect(box.xMin, box.yMin, box.width, box.height);
         cameraStatus.textContent = "Face detected.";
+    } catch (error) {
+        if (stream === activeStream) {
+            stopCamera();
+            console.error(error);
+            cameraStatus.textContent = `Face detection failed: ${error.message}`;
+        }
+    } finally {
+        detectionBusy = false;
     }
 }
 
