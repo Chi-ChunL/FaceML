@@ -1,18 +1,17 @@
 import * as tf from "@tensorflow/tfjs";
 import "./camera.js";
+import { classNames, loadExpressionModel, predictExpression } from "./model.js";
 
 const status = document.querySelector("#status");
 const imageUpload = document.querySelector("#image-upload");
 const preview = document.querySelector("#preview");
 
-const classNames = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"];
 let model;
 
 async function main() {
     try {
         await tf.ready();
-        const modelUrl = `${import.meta.env.BASE_URL}models/expression/model.json`;
-        model = await tf.loadLayersModel(modelUrl);
+        model = await loadExpressionModel();
         model.summary();
         const probabilities = tf.tidy(() => {
             const input = tf.zeros([1, 48, 48, 1]);
@@ -29,6 +28,7 @@ async function main() {
         `Probability sum: ${probabilitySum.toFixed(4)}`,
         ].join("\n");
         imageUpload.disabled = false;
+        document.querySelector("#start-camera").disabled = false;
         } catch (error) {
         console.error(error);
         status.textContent = `Model test failed:\n${error.message}`;
@@ -55,15 +55,7 @@ imageUpload.addEventListener("change", async () => {
         const context = canvas.getContext("2d");
         context.drawImage(preview, 0, 0, 48, 48);
 
-        const probabilities = tf.tidy(() => {
-            const pixels = tf.browser.fromPixels(canvas).toFloat();
-            const rgbWeights = tf.tensor1d([0.299, 0.587, 0.114]);
-
-            const grayscale = pixels.mul(rgbWeights).sum(2);
-            const input = grayscale.expandDims(-1).expandDims(0);
-
-            return Array.from(model.predict(input).dataSync());
-        });
+        const probabilities = predictExpression(canvas);
 
         const bestIndex = probabilities.indexOf(Math.max(...probabilities));
         const probabilitySum = probabilities.reduce((total, probability) => total + probability, 0);

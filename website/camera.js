@@ -1,5 +1,6 @@
 import * as tf from "@tensorflow/tfjs";
 import {load as loadFaceDetector} from "@tensorflow-models/face-detection/dist/tfjs/detector.js";
+import { classNames, predictExpression } from "./model";
 
 const video = document.querySelector("#webcam");
 const startButton = document.querySelector("#start-camera");
@@ -7,6 +8,9 @@ const stopButton = document.querySelector("#stop-camera");
 const cameraStatus = document.querySelector("#camera-status");
 const overlay = document.querySelector("#face-overlay");
 const overlayContext = overlay.getContext("2d");
+const faceCanvas = document.querySelector("#face-crop");
+const faceContext = faceCanvas.getContext("2d");
+const livePrediction = document.querySelector("#live-prediction");
 
 let stream = null;
 let detector = null;
@@ -14,6 +18,8 @@ let detectionBusy = false;
 let detectionTimer = null;
 
 function stopCamera() {
+    faceContext.clearRect(0,0,48,48);
+    livePrediction.textContent = "No live Predicition";
     window.clearInterval(detectionTimer);
     detectionTimer = null;
     overlayContext.clearRect(0, 0, overlay.width, overlay.height);
@@ -89,6 +95,8 @@ async function detectFace() {
         overlayContext.clearRect(0, 0, overlay.width, overlay.height);
         if (faces.length === 0) {
             cameraStatus.textContent = "No face detected.";
+            faceContext.clearRect(0,0,48,48);
+            livePrediction.textContent = "No face detected.";
             return;
         }
 
@@ -97,6 +105,7 @@ async function detectFace() {
         overlayContext.lineWidth = 3;
         overlayContext.strokeRect(box.xMin, box.yMin, box.width, box.height);
         cameraStatus.textContent = "Face detected.";
+        predictDetectedFace(box);
     } catch (error) {
         if (stream === activeStream) {
             stopCamera();
@@ -106,6 +115,42 @@ async function detectFace() {
     } finally {
         detectionBusy = false;
     }
+}
+
+function predictDetectedFace(box) {
+    const side = Math.min(
+        Math.max(box.width, box.height) * 1.15,
+        video.videoWidth,
+        video.videoHeight
+    );
+
+    const centerX = box.xMin + box.width /2;
+    const centerY = box.yMin + box.height / 2;
+
+    const x = Math.max(0, Math.min(centerX - side / 2, video.videoWidth - side));
+    const y = Math.max(0, Math.min(centerY - side / 2, video.videoHeight - side));
+    faceContext.drawImage(
+        video,
+        x, y, side, side,
+        0, 0, 48, 48
+    );
+
+    const probabilities = predictExpression(faceCanvas);
+    const bestIndex = probabilities.indexOf(Math.max(...probabilities));
+
+    livePrediction.textContent = [
+    `Prediction: ${classNames[bestIndex]} ` +
+        `(${(probabilities[bestIndex] * 100).toFixed(2)}%)`,
+    "",
+    ...classNames.map((name, index) =>
+        `${name}: ${(probabilities[index] * 100).toFixed(2)}%`
+    ),
+    "",
+    `Probability sum: ${
+        probabilities.reduce((total, value) => total + value, 0)
+        .toFixed(4)
+    }`,
+    ].join("\n");
 }
 
 startButton.addEventListener("click", startCamera);
