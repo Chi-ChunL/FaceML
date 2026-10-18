@@ -15,7 +15,7 @@ class_names = validation_dataset.class_names
 validation_dataset = validation_dataset.cache()
 true_labels = np.concatenate([labels.numpy() for images, labels in validation_dataset ])
 #repeated outputing the data so I can have a comparison
-model_files = ["baseline_best.keras", "baseline_augmented_best.keras", "improved_best.keras", "improved_weighted_best.keras"]
+model_files = ["improved_best.keras", "improved_expanded_best.keras"]
 for filename in model_files:
     model_path = PROJECT_ROOT / "models" / filename
     model = tf.keras.models.load_model(model_path)

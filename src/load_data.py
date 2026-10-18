@@ -1,6 +1,7 @@
 from pathlib import Path
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import csv
 
 #defining my constant so its easier to link to it
 IMAGE_SIZE = (48, 48)
@@ -24,6 +25,44 @@ def create_training_datasets():
 def create_test_dataset():
     test_dataset = tf.keras.utils.image_dataset_from_directory(TEST_DIRECTORY, image_size=IMAGE_SIZE, color_mode="grayscale", batch_size=BATCH_SIZE, label_mode="int", shuffle=False)
     return test_dataset
+
+def load_training_image(path, label):
+    image = tf.io.read_file(path)
+    image = tf.io.decode_image(image, channels=1, expand_animations=False)
+    image = tf.image.resize(image, IMAGE_SIZE)
+    return image, label
+
+def create_expanded_training_datasets():
+    fer_train, validation_dataset = create_training_datasets()
+
+    class_names = list(fer_train.class_names)
+    paths = list(fer_train.file_paths)
+
+    labels = [
+        class_names.index(Path(path).parent.name)
+        for path in paths
+    ]
+
+    manifest_path = (PROJECT_ROOT / "data" / "expw_prepared" / "training_manifest.csv")
+
+    with manifest_path.open(newline="", encoding="utf-8") as file:
+        for row in csv.DictReader(file):
+            paths.append(str(PROJECT_ROOT / row["prepared_path"]))
+            labels.append(class_names.index(row["class_name"]))
+    train_dataset = tf.data.Dataset.from_tensor_slices((paths, labels))
+
+    train_dataset = train_dataset.shuffle(buffer_size=len(paths), seed=RANDOM_SEED)
+    train_dataset = train_dataset.map(
+        load_training_image,
+        num_parallel_calls=tf.data.AUTOTUNE,
+    )
+
+    train_dataset = train_dataset.batch(BATCH_SIZE)
+
+    train_dataset.class_names = class_names
+    train_dataset.file_paths = paths
+
+    return train_dataset, validation_dataset
 
 def main():
     #acquire only allocated gpu memory and not blow up my computer
