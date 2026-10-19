@@ -55,20 +55,37 @@ data_augmentation = tf.keras.Sequential(
         tf.keras.layers.RandomTranslation(height_factor=0.1, width_factor=0.1, fill_mode="reflect"),
 ])
 
-def augment_batch(images, labels):
-    augmented_images = data_augmentation(images, training=True)
-    return augmented_images, labels
-train_dataset = train_dataset.map(augment_batch, num_parallel_calls=tf.data.AUTOTUNE)
-train_dataset = train_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
-validation_dataset = validation_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
 
-BEST_MODEL_PATH = PROJECT_ROOT / "models" / "transfer_full_expanded_best.keras"
+def augment_batch(images, labels):
+    images = data_augmentation(images, training=True)
+    labels = tf.one_hot(labels, depth=len(class_names))
+    return images, labels
+
+def prepare_validation_batch(images, labels):
+    labels = tf.one_hot(labels, depth=len(class_names))
+    return images, labels
+
+
+train_dataset = train_dataset.map(
+    augment_batch,
+    num_parallel_calls=tf.data.AUTOTUNE,
+)
+
+validation_dataset = validation_dataset.map(
+    prepare_validation_batch,
+    num_parallel_calls=tf.data.AUTOTUNE,
+)
+
+train_dataset = train_dataset.prefetch(tf.data.AUTOTUNE)
+validation_dataset = validation_dataset.prefetch(tf.data.AUTOTUNE)
+
+BEST_MODEL_PATH = PROJECT_ROOT / "models" / "transfer_label_smoothing_best.keras"
 RESULTS_DIRECTORY = PROJECT_ROOT / "results"
 RESULTS_DIRECTORY.mkdir(exist_ok=True)
 
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003),
-    loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
     metrics=["accuracy"],
 )
 
@@ -95,7 +112,7 @@ callbacks = [
         restore_best_weights=True,
         verbose=1,
     ),
-    tf.keras.callbacks.CSVLogger(str(RESULTS_DIRECTORY / "transfer_full_expanded_history.csv")),
+    tf.keras.callbacks.CSVLogger(str(RESULTS_DIRECTORY / "transfer_label_smoothing_history.csv")),
 ]
 history = model.fit(
     train_dataset,
