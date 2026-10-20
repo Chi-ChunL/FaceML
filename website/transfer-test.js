@@ -5,10 +5,13 @@ const status = document.querySelector("#status");
 async function main() {
     await tf.ready();
 
-    const modelURL =
-        `${import.meta.env.BASE_URL}models/transfer-probe/model.json`;
+    const baseURL = `${import.meta.env.BASE_URL}models/`;
 
-    const model = await tf.loadGraphModel(modelURL);
+    status.textContent = "Loading B0 and B2...";
+
+    const b0Model = await tf.loadGraphModel(`${baseURL}b0/model.json`);
+    const b2Model = await tf.loadGraphModel(`${baseURL}b2/model.json`);
+
     const input = tf.fill([1, 48, 48, 1], 127);
 
     try {
@@ -22,7 +25,12 @@ async function main() {
 
         for (let i = 0; i < warmupRuns + measuredRuns; i++) {
             const started = performance.now();
-            const prediction = tf.tidy(() => model.predict(input));
+            const prediction = tf.tidy(() => {
+                const b0probabilities = b0Model.predict(input);
+                const b2probabilities = b2Model.predict(input);
+
+                return b0probabilities.add(b2probabilities).mul(0.5);
+            });
 
             try {
                 probabilities = Array.from(await prediction.data());
@@ -54,7 +62,8 @@ async function main() {
         }, null, 2);
     } finally {
         input.dispose();
-        model.dispose();
+        b0Model.dispose();
+        b2Model.dispose();
     }
 }
 

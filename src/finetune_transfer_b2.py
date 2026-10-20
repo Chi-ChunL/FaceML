@@ -17,6 +17,7 @@ WARMUP_MODEL_PATH = (
     / "transfer_b2_warmup_best.keras"
 )
 
+#the model warmup path
 model = tf.keras.models.load_model(
     WARMUP_MODEL_PATH,
     compile=False,
