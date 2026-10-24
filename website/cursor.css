@@ -1,0 +1,37 @@
+.space-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    z-index: 9999;
+
+    pointer-events: none;
+    visibility: hidden;
+    image-rendering: pixelated;
+    background-repeat: no-repeat;
+    background-size: 800px 32px;
+
+    animation: cursor-sparkle 2.5s steps(25) infinite;
+}
+
+@keyframes cursor-sparkle {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -800px 0;
+    }
+}
+
+html.custom-cursor-active,
+html.custom-cursor-active * {
+    cursor: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .space-cursor {
+        animation: none;
+    }
+}

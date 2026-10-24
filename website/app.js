@@ -1,6 +1,7 @@
 import * as tf from "@tensorflow/tfjs";
 import "./camera.js";
 import { classNames, loadExpressionModel, predictExpression } from "./model.js";
+import "./cursor.js";
 
 const status = document.querySelector("#status");
 const imageUpload = document.querySelector("#image-upload");
