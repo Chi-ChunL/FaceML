@@ -2,6 +2,7 @@ import * as tf from "@tensorflow/tfjs";
 import "./camera.js";
 import { classNames, loadExpressionModel, predictExpression } from "./model.js";
 import "./cursor.js";
+import "./style.css"
 
 const status = document.querySelector("#status");
 const imageUpload = document.querySelector("#image-upload");
@@ -78,3 +79,11 @@ imageUpload.addEventListener("change", async () => {
 });
 
 main();
+window.addEventListener("load", () => {
+    if (!window.location.hash) {
+        document.querySelector("#city").scrollIntoView({
+            behavior: "instant",
+            block: "start",
+        });
+    }
+});

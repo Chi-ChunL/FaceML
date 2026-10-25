@@ -1,0 +1,44 @@
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 0;
+    background-color: #310047;
+    box-sizing: border-box;
+    color: #fffdf2;
+    font-family: system-ui, sans-serif;
+    isolation: isolate;
+}
+
+.city-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background-color: #310047;
+    background-image: url("./assets/background/space-background.png");
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.space-section {
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.city-section {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+
+    display: grid;
+    place-content: center;
+    text-align: center;
+}
