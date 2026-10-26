@@ -1,32 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&amp;display=swap">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FaceML</title>
 </head>
 <body>
     <section id="projects" class="space-section">
-        <h1>FaceML</h1>
-        <p>Facial-expression recongition</p>
-        <div>
-            <button id="start-camera" disabled>Start Camera</button>
-            <button id="stop-camera" disabled>Stop</button>
-        </div>
-        <p id="camera-status">Camera is off.</p>
-        <div style="position: relative; width: 640px; max-width: 100%; transform: scaleX(-1);">
-            <video id="webcam" autoplay muted playsinline width="640" style="width: 100%; display: block;"></video>
-            <canvas id="face-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
-        </div>
-        <p>Face crop:</p>
-        <canvas id="face-crop" width="48" height="48" style="width: 144px; height: 144px;"></canvas>
-        <pre id="live-prediction">No live prediction.</pre>
-        <label for="image-upload">Choose a cropped face image:</label>
-        <input id="image-upload" type="file" accept="image/*" disabled>
+        <h1>Projects</h1>
+        <article class="project-card">
+            <h2>SpaceML</h2>
+            <p>Explore facial recognition prediction using your webcam or an uploaded face image.</p>
+            <button
+                id="try-faceml"
+                class="project-button"
+                type="button"
+                aria-controls="faceml-demo"
+                aria-expanded="false">Try SpaceML</button>
+            <div id="faceml-demo" hidden>
+                <div>
+                    <button id="start-camera" disabled>Start Camera</button>
+                    <button id="stop-camera" disabled>Stop</button>
+                </div>
+                <p id="camera-status">Camera is off.</p>
+                <div style="position: relative; width: 640px; max-width: 100%; transform: scaleX(-1);">
+                    <video id="webcam" autoplay muted playsinline width="640" style="width: 100%; display: block;"></video>
+                    <canvas id="face-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                </div>
+                <p>Face crop:</p>
+                <canvas id="face-crop" width="48" height="48" style="width: 144px; height: 144px;"></canvas>
+                <pre id="live-prediction">No live prediction.</pre>
+                <label for="image-upload">Choose a cropped face image:</label>
+                <input id="image-upload" type="file" accept="image/*" disabled>
 
-        <br>
-        <img id="preview" width="192" alt="Selected face" hidden>
-        <pre id="status">Loading the model...</pre>
+                <br>
+                <img id="preview" width="192" alt="Selected face" hidden>
+                <pre id="status">Loading the model...</pre>
+            </div>
+        </article>
     </section>
     <section id="city" class="city-section">
         <h1>ChiChi</h1>

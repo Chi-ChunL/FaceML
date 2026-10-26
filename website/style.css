@@ -5,8 +5,47 @@ body {
     background-color: #310047;
     box-sizing: border-box;
     color: #fffdf2;
-    font-family: system-ui, sans-serif;
+    font-family: "Pixelify Sans", sans-serif;
+    font-size: 20px;
+    color: #ffffff;
     isolation: isolate;
+}
+
+.space-section {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.space-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background-color: #310047;
+    background-image: url("./assets/background/starfield.png");
+    background-size: 100% auto;
+    background-position: center bottom;
+    background-repeat: repeat-y;
+
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+
+.city-section {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+
+    display: grid;
+    place-content: center;
+    text-align: center;
 }
 
 .city-section::before {
@@ -25,20 +64,30 @@ body {
     pointer-events: none;
 }
 
-.space-section {
-    min-height: 100vh;
+.project-card {
+    max-width: 760px;
+    margin: 32px auto;
     padding: 24px;
-    box-sizing: border-box;
+    background: rgba(22, 13, 38, 0.9);
+    border: 2px solid #65456b
 }
 
-.city-section {
-    position: relative;
-    isolation: isolate;
-    min-height: 100vh;
-    padding: 24px;
-    box-sizing: border-box;
+.project-button {
+    padding: 12px 20px;
+    font: inherit;
+    color: #fffdf2;
+    background: #4b104e;
+    border: 2px solid #8c5aa6;
+}
 
-    display: grid;
-    place-content: center;
-    text-align: center;
+#faceml-demo {
+    margin-top: 24px;
+}
+
+button, input {
+    font: inherit;
+}
+
+a {
+    color: #ffffff;
 }

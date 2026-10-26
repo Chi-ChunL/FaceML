@@ -79,6 +79,7 @@ imageUpload.addEventListener("change", async () => {
 });
 
 main();
+
 window.addEventListener("load", () => {
     if (!window.location.hash) {
         document.querySelector("#city").scrollIntoView({
@@ -86,4 +87,17 @@ window.addEventListener("load", () => {
             block: "start",
         });
     }
+});
+
+const tryFaceML = document.querySelector("#try-faceml")
+const faceMLDemo = document.querySelector("#faceml-demo")
+
+tryFaceML.addEventListener("click", () => {
+    faceMLDemo.hidden = false;
+    tryFaceML.setAttribute("aria-expanded", "true");
+
+    faceMLDemo.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+    });
 });
