@@ -9,6 +9,7 @@ body {
     font-size: 20px;
     color: #ffffff;
     isolation: isolate;
+    position: relative;
 }
 
 .space-section {
@@ -90,4 +91,41 @@ button, input {
 
 a {
     color: #ffffff;
+}
+
+#spaceship {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 64px;
+    height: 128px;
+    z-index: 20;
+
+    background-image: url("./assets/ships/spaceship-sheet.png");
+    background-size: 192px 128px;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    pointer-events: auto;
+    visibility: hidden;
+    outline: none;
+
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+
+    animation: spaceship-engine 0.3s steps(3) infinite;
+}
+
+#spaceship:focus-visible {
+    filter: drop-shadow(0 0 3px #b591c6);
+}
+
+@keyframes spaceship-engine {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -192px 0;
+    }
 }
