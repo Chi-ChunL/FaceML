@@ -67,10 +67,11 @@ body {
 
 .project-card {
     max-width: 760px;
-    margin: 32px auto;
+    margin: 64px auto;
     padding: 24px;
-    background: rgba(22, 13, 38, 0.9);
-    border: 2px solid #65456b
+    text-align: center;
+    background: transparent;
+    border: 0;
 }
 
 .project-button {
@@ -101,8 +102,6 @@ a {
     height: 128px;
     z-index: 20;
 
-    background-image: url("./assets/ships/spaceship-sheet.png");
-    background-size: 192px 128px;
     background-repeat: no-repeat;
     image-rendering: pixelated;
     pointer-events: auto;
@@ -112,7 +111,16 @@ a {
     padding: 0;
     border: 0;
     background-color: transparent;
+    background-image: url("./assets/ships/spaceship-standing.png");
+    background-size: 64px 128px;
+    background-position: 0 0;
+    animation: none;
 
+}
+
+#spaceship.is-thrusting {
+    background-image: url("./assets/ships/spaceship-sheet.png");
+    background-size: 192px 128px;
     animation: spaceship-engine 0.3s steps(3) infinite;
 }
 
@@ -128,4 +136,17 @@ a {
     to {
         background-position: -192px 0;
     }
+}
+
+#spaceml-planet {
+    width: min(256px, 60vw);
+    aspect-ratio: 1;
+    margin: 0 auto;
+
+    background-image: url("./assets/planets/smiling-planet.png");
+    background-size: 200% 200%;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    image-rendering: pixelated;
 }

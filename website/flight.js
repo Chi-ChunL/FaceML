@@ -1,6 +1,8 @@
 const ship = document.querySelector("#spaceship");
 const launchButton = document.querySelector("#launch-flight");
 const city = document.querySelector("#city");
+const planet = document.querySelector("#spaceml-planet");
+const demo = document.querySelector("#faceml-demo");
 
 const keys = new Set();
 const movementKeys = ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"];
@@ -13,6 +15,7 @@ let y = city.offsetTop + city.offsetHeight - ship.offsetHeight - 24;
 let previousTime = performance.now()
 
 launchButton.addEventListener("click", () => {
+    if (!demo.hidden) return;
     ship.style.visibility = "visible";
     ship.focus({ preventScroll: true });
 });
@@ -37,17 +40,34 @@ ship.addEventListener("keyup", event => {
 ship.addEventListener("blur", () => keys.clear());
 window.addEventListener("blur", () => keys.clear());
 
+function touchesPlanet(width, height, sin, cos) {
+    const bounds = planet.getBoundingClientRect();
+    const planetX = bounds.left + bounds.width / 2 + window.scrollX;
+    const planetY = bounds.top + bounds.height / 2 + window.scrollY;
+    const dx = planetX - (x + width / 2);
+    const dy = planetY - (y + height / 2);
+    const localX = dx * cos + dy * sin;
+    const localY = -dx * sin + dy * cos;
+    const hullTop = -height / 2;
+    const hullBottom = hullTop + height * (44 / 64);
+    const closestX = Math.max(-width / 2, Math.min(localX, width/2));
+    const closestY = Math.max(hullTop, Math.min(localY, hullBottom));
+    const distance = Math.hypot(localX - closestX, localY - closestY);
+    return distance <= bounds.width / 2;
+
+}
+
 function updateFlight(time) {
     const deltaTime = Math.min((time - previousTime) / 1000, 0.05);
     previousTime = time;
 
     const right = keys.has("KeyD") || keys.has("ArrowRight");
     const left = keys.has("KeyA") || keys.has("ArrowLeft");
-    const down = keys.has("KeyS") || keys.has("ArrowDown");
     const up = keys.has("KeyW") || keys.has("ArrowUp");
 
     const turn = Number(right) - Number(left)
-    const throttle = Number(up) - Number(down);
+    const throttle = Number(up);
+    ship.classList.toggle("is-thrusting", up);
 
     angle += turn * turnSpeed * deltaTime;
 
@@ -77,6 +97,15 @@ function updateFlight(time) {
     ship.style.left = `${x}px`;
     ship.style.top = `${y}px`;
     ship.style.transform = `rotate(${angle}deg)`
+
+    if (document.activeElement === ship && demo.hidden && touchesPlanet(width, height, sin, cos)) {
+        keys.clear();
+        ship.classList.remove("is-thrusting");
+        ship.style.visibility = "hidden";
+        ship.blur();
+
+        window.dispatchEvent(new Event("spaceml-landed"));
+    }
 
     if (document.activeElement === ship) {
         const shipCenterY = y + ship.offsetHeight / 2;

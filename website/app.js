@@ -90,12 +90,12 @@ window.addEventListener("load", () => {
     }
 });
 
-const tryFaceML = document.querySelector("#try-faceml")
 const faceMLDemo = document.querySelector("#faceml-demo")
 
-tryFaceML.addEventListener("click", () => {
+window.addEventListener("spaceml-landed", () => {
     faceMLDemo.hidden = false;
-    tryFaceML.setAttribute("aria-expanded", "true");
+    faceMLDemo.tabIndex = -1;
+    faceMLDemo.focus({ preventScroll: true });
 
     faceMLDemo.scrollIntoView({
         behavior: "smooth",
