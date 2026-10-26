@@ -5,6 +5,8 @@ const city = document.querySelector("#city");
 const keys = new Set();
 const movementKeys = ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"];
 const speed = 240;
+const turnSpeed = 180;
+let angle = 0;
 
 let x = (document.documentElement.clientWidth - ship.offsetWidth) / 2;
 let y = city.offsetTop + city.offsetHeight - ship.offsetHeight - 24;
@@ -44,24 +46,37 @@ function updateFlight(time) {
     const down = keys.has("KeyS") || keys.has("ArrowDown");
     const up = keys.has("KeyW") || keys.has("ArrowUp");
 
-    const dx = Number(right) - Number(left);
-    const dy = Number(down) - Number(up);
-    const length = Math.hypot(dx, dy);
+    const turn = Number(right) - Number(left)
+    const throttle = Number(up) - Number(down);
 
-    if (length > 0) {
-        x += (dx / length) * speed * deltaTime;
-        y += (dy / length) * speed * deltaTime;
-    }
+    angle += turn * turnSpeed * deltaTime;
 
-    const maxX = document.documentElement.clientWidth - ship.offsetWidth;
+    const radians = angle * Math.PI / 180;
+    const sin = Math.sin(radians);
+    const cos = Math.cos(radians);
+
+    x += sin * throttle * speed * deltaTime;
+    y -= cos * throttle * speed * deltaTime;
+
+    const width = ship.offsetWidth;
+    const height = ship.offsetHeight;
     const worldHeight = document.body.clientHeight;
-    const maxY = worldHeight - ship.offsetHeight;
 
-    x = Math.max(0, Math.min(x, maxX));
-    y = Math.max(0, Math.min(y, maxY));
+    const rotatedWidth = Math.abs(cos) * width + Math.abs(sin) * height;
+    const rotatedHeight = Math.abs(sin) * width + Math.abs(cos) * height;
+
+    const paddingX = Math.max(0, (rotatedWidth - width) / 2);
+    const paddingY = Math.max(0, (rotatedHeight - height) / 2);
+    
+    const maxX = document.documentElement.clientWidth - width - paddingX;
+    const maxY = worldHeight - height - paddingY;
+
+    x = Math.max(paddingX, Math.min(x, maxX));
+    y = Math.max(paddingY, Math.min(y, maxY));
 
     ship.style.left = `${x}px`;
     ship.style.top = `${y}px`;
+    ship.style.transform = `rotate(${angle}deg)`
 
     if (document.activeElement === ship) {
         const shipCenterY = y + ship.offsetHeight / 2;
