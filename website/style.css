@@ -426,7 +426,7 @@ body.is-loading > section {
     }
 }
 
-#load-content {
+#loading-content {
     display: grid;
     justify-items: center;
     gap: 20px;
@@ -437,3 +437,30 @@ body.is-loading > section {
     display: none;
 }
 
+#name-splash {
+    font-size: clamp(48px, 12vw, 112px);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fffdf2;
+    text-shadow: 4px 4px 0 #47165a;
+    animation: name-appear 0.4s ease-out both;
+}
+
+@keyframes name-appear {
+    from { opacity: 0;} to {opacity: 1;}
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #name-splash {
+        animation: none;
+    }
+}
+
+.splash-credit {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 24px;
+    font-weight: 400;
+    color: #b591c6;
+    text-shadow: none;
+}

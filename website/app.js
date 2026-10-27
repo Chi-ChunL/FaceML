@@ -88,19 +88,42 @@ imageUpload.addEventListener("change", async () => {
 
 main();
 
-const loadingScreen = document.querySelector("#loading-screen");
-loadingScreen.classList.add("is-playing");
-window.setTimeout(() => {
+function wait(milliseconds) {
+    return new Promise(resolve => {
+        window.setTimeout(resolve, milliseconds);
+    });
+}
+
+async function playIntro() {
+    const loadingScreen = document.querySelector("#loading-screen");
+    const loadingContent = document.querySelector("#loading-content");
+    const nameSplash = document.querySelector("#name-splash");
+    loadingScreen.classList.add("is-playing");
+    await wait(2100);
+
+    loadingContent.hidden = true;
+    nameSplash.hidden = false;
+    await wait(1500);
+
+    document.body.classList.remove("is-loading");
+
     if (!window.location.hash) {
         document.querySelector("#city").scrollIntoView({
             behavior: "instant",
             block: "start",
         });
     }
-
+    const fade = loadingScreen.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 700,
+        easing: "ease-in-out",
+        fill: "forwards",
+    });
+    
+    await fade.finished;
     loadingScreen.remove();
-    document.body.classList.remove("is-loading");
-}, 2100);
+}
+
+playIntro();
 
 const faceMLDemo = document.querySelector("#faceml-demo");
 document.querySelector("#leave-planet").addEventListener("click", () => {
