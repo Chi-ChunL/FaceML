@@ -88,13 +88,17 @@ function touchesPlanet(width, height, sin, cos) {
     const dy = planetY - (y + height / 2);
     const localX = dx * cos + dy * sin;
     const localY = -dx * sin + dy * cos;
-    const hullTop = -height / 2;
-    const hullBottom = hullTop + height * (44 / 64);
-    const closestX = Math.max(-width / 2, Math.min(localX, width/2));
-    const closestY = Math.max(hullTop, Math.min(localY, hullBottom));
-    const distance = Math.hypot(localX - closestX, localY - closestY);
-    return distance <= bounds.width / 2;
+    const radius = bounds.width / 2;
 
+    for (let i = 0; i < hull.length; i++) {
+        const [ax, ay] = hull[i];
+        const [bx, by] = hull[(i + 1) % hull.length];
+        const ex = bx - ax;
+        const ey = by - ay;
+        const t = Math.max(0, Math.min(1, ((localX - ax) * ex + (localY - ay) * ey) / (ex * ex + ey * ey)));
+        if (Math.hypot(localX - (ax + t * ex), localY - (ay + t * ey)) <= radius) return true;
+    }
+    return false;
 }
 
 function updateFlight(time) {
@@ -141,29 +145,36 @@ function updateFlight(time) {
     const height = ship.offsetHeight;
     const worldHeight = document.body.clientHeight;
 
-    const rotatedWidth = Math.abs(cos) * width + Math.abs(sin) * height;
-    const rotatedHeight = Math.abs(sin) * width + Math.abs(cos) * height;
+    let reachLeft = Infinity, reachRight = -Infinity;
+    let reachTop = Infinity, reachBottom = -Infinity;
+    for (const [hx, hy] of hull) {
+        const px = hx * cos - hy * sin;
+        const py = hx * sin + hy * cos;
+        reachLeft = Math.min(reachLeft, px);
+        reachRight = Math.max(reachRight, px);
+        reachTop = Math.min(reachTop, py);
+        reachBottom = Math.max(reachBottom, py);
+    }
 
-    const paddingX = Math.max(0, (rotatedWidth - width) / 2);
-    const paddingY = Math.max(0, (rotatedHeight - height) / 2);
-    
-    const maxX = document.documentElement.clientWidth - width - paddingX;
-    const maxY = worldHeight - height - paddingY;
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    const pageWidth = document.documentElement.clientWidth;
 
-    if (x < paddingX) {
-        x= paddingX;
+    if (centerX + reachLeft < 0) {
+        x -= centerX + reachLeft;
         vx = Math.abs(vx) * bounce;
-    } else if (x > maxX) {
-        x = maxX;
+    } else if (centerX + reachRight > pageWidth) {
+        x -= centerX + reachRight - pageWidth;
         vx = -Math.abs(vx) * bounce;
     }
-    if (y < paddingY) {
-        y = paddingY;
+    if (centerY + reachTop < 0) {
+        y -= centerY + reachTop;
         vy = Math.abs(vy) * bounce;
-    } else if (y > maxY) {
-        y = maxY;
+    } else if (centerY + reachBottom > worldHeight) {
+        y -= centerY + reachBottom - worldHeight;
         vy = -Math.abs(vy) * bounce;
     }
+
 
     ship.style.left = `${x}px`;
     ship.style.top = `${y}px`;
