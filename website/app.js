@@ -90,7 +90,11 @@ window.addEventListener("load", () => {
     }
 });
 
-const faceMLDemo = document.querySelector("#faceml-demo")
+const faceMLDemo = document.querySelector("#faceml-demo");
+document.querySelector("#leave-planet").addEventListener("click", () => {
+    faceMLDemo.hidden = true;
+    window.dispatchEvent(new Event("spaceml-exited"));
+})
 
 window.addEventListener("spaceml-landed", () => {
     faceMLDemo.hidden = false;

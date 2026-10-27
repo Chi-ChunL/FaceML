@@ -84,7 +84,17 @@ body {
 
 #faceml-demo {
     margin-top: 24px;
+    padding: 16px;
     outline: none;
+    text-align: left;
+    position: relative;
+    padding-top: 80px;
+
+    border: 16px solid transparent;
+    border-image-source: url("./assets/background/spaceml-background.png");
+    border-image-slice: 8 fill;
+    border-image-repeat: stretch;
+    image-rendering: pixelated;
 }
 
 button, input {
@@ -170,4 +180,71 @@ a {
     color: #ffffff;
     text-align: center;
     pointer-events: none;
+}
+
+#leave-planet {
+    position: absolute;
+    top: 25px;
+    right: 30px;
+    z-index: 50;
+
+    width: 128px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+
+    background: transparent url("./assets/buttons/exit-button-unpressed.png") center / 100% 100% no-repeat;
+
+    image-rendering: pixelated;
+}
+
+#leave-planet:hover, 
+#leave-planet:focus-visible {
+    background-image: url("./assets/buttons/exit-button-hover.png");
+}
+
+#leave-planet:active {
+    background-image: url("./assets/buttons/exit-button-pressed.png");
+}
+
+.camera-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap:12px;
+}
+
+.pixel-button {
+    width: 192px;
+    height: 48px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: 0;
+
+    font: inherit;
+    color: #fffdf2;
+
+    background: transparent url("./assets/buttons/buttons-template-unpressed.png") center / 100% 100% no-repeat;
+    image-rendering: pixelated;
+}
+
+.pixel-button:hover:not(:disabled),
+.pixel-button:focus-visible:not(:disabled) {
+    background-image: url("./assets/buttons/buttons-template-hover.png");
+}
+
+.pixel-button:active:not(:disabled) {
+    background-image: url("./assets/buttons/buttons-template-pressed.png");
+}
+
+.pixel-button:disabled {
+    opacity: 0.45;
+}
+
+.pixel-button:focus-visible {
+    outline: 2px solid #b591c6;
+    outline-offset: 3px;
+}
+
+#webcam {
+    background: #160d26 url("./assets/mini-deco/camera.png") center / 64px 64px no-repeat;
 }

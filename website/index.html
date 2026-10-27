@@ -6,7 +6,7 @@
         href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&amp;display=swap">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceML</title>
+    <title>SpaceWeb</title>
 </head>
 <body>
     <section id="projects" class="space-section">
@@ -16,9 +16,10 @@
             <h2>SpaceML</h2>
             <p>Explore facial recognition prediction using your webcam or an uploaded face image.</p>
             <div id="faceml-demo" hidden>
-                <div>
-                    <button id="start-camera" disabled>Start Camera</button>
-                    <button id="stop-camera" disabled>Stop</button>
+                <button id="leave-planet" type="button" aria-label="Return to space" title="Return tp space (Esc)"></button>
+                <div class="camera-controls">
+                    <button id="start-camera" class="pixel-button" disabled>Start Camera</button>
+                    <button id="stop-camera" class="pixel-button" disabled>Stop</button>
                 </div>
                 <p id="camera-status">Camera is off.</p>
                 <div style="position: relative; width: 640px; max-width: 100%; transform: scaleX(-1);">
