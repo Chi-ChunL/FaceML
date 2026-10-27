@@ -2,7 +2,6 @@ import * as tf from "@tensorflow/tfjs";
 import { stopCamera, renderProbabilities, isCurrentMediaRequest } from "./camera.js";
 import { classNames, loadExpressionModel, predictExpression } from "./model.js";
 import "./cursor.js";
-import "./style.css";
 import "./flight.js";
 
 const status = document.querySelector("#status");
@@ -89,14 +88,19 @@ imageUpload.addEventListener("change", async () => {
 
 main();
 
-window.addEventListener("load", () => {
+const loadingScreen = document.querySelector("#loading-screen");
+loadingScreen.classList.add("is-playing");
+window.setTimeout(() => {
     if (!window.location.hash) {
         document.querySelector("#city").scrollIntoView({
             behavior: "instant",
             block: "start",
         });
     }
-});
+
+    loadingScreen.remove();
+    document.body.classList.remove("is-loading");
+}, 2100);
 
 const faceMLDemo = document.querySelector("#faceml-demo");
 document.querySelector("#leave-planet").addEventListener("click", () => {

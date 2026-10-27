@@ -376,3 +376,64 @@ a {
         animation: none;
     }
 }
+
+body.is-loading {
+    overflow: hidden;
+}
+
+body.is-loading > section {
+    visibility: hidden;
+}
+
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 20px;
+    background: #160d26;
+}
+
+.loading-rocket {
+    width: 64px;
+    height: 128px;
+    background: url("./assets/ships/spaceship-sheet.png") 0 0 / 192px 128px no-repeat;
+    image-rendering: pixelated;
+    animation: spaceship-engine 0.3s steps(3) infinite;
+}
+
+#loading-screen .probability-track {
+    width: min(240px, 70vw);
+}
+
+#loading-screen.is-playing .probability-fill {
+    animation: intro-progress 2s steps(20) forwards;
+}
+
+#loading-screen p {
+    margin: 0;
+}
+
+@keyframes intro-progress {
+    from {width: 0%;} to { width: 100%;}
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loading-rocket {
+        animation: none;
+    }
+}
+
+#load-content {
+    display: grid;
+    justify-items: center;
+    gap: 20px;
+}
+
+#loading-content[hidden],
+#name-splash[hidden] {
+    display: none;
+}
+
