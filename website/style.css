@@ -184,12 +184,12 @@ a {
 
 #leave-planet {
     position: absolute;
-    top: 25px;
+    top: 20px;
     right: 30px;
     z-index: 50;
 
-    width: 128px;
-    height: 48px;
+    width: 100px;
+    height: 40px;
     padding: 0;
     border: 0;
 
@@ -247,4 +247,71 @@ a {
 
 #webcam {
     background: #160d26 url("./assets/mini-deco/camera.png") center / 64px 64px no-repeat;
+}
+
+.demo-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    margin-top: 20px;
+}
+
+.camera-view {
+    position: relative;
+    transform: scaleX(-1);
+}
+
+#webcam {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#face-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.expression-panel h3 {
+    margin: 0 0 12px;
+}
+
+#live-prediction {
+    margin: 0 0 20px;
+    font-size: 24px;
+}
+
+.probability-row {
+    margin-bottom: 12px;
+}
+
+.probability-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+    text-transform: capitalize;
+}
+
+.probability-track {
+    height: 8px;
+    background: #160d26;
+    border: 2px solid #8c5aa6;
+}
+
+.probability-fill {
+    width: 0%;
+    height: 100%;
+    background: #b591c6;
+    transition: width 100ms linear;
+}
+
+@media (max-width: 760px) {
+    .demo-layout {
+        grid-template-columns: 1fr;
+    }
 }

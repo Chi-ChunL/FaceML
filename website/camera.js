@@ -11,6 +11,24 @@ const overlayContext = overlay.getContext("2d");
 const faceCanvas = document.querySelector("#face-crop");
 const faceContext = faceCanvas.getContext("2d");
 const livePrediction = document.querySelector("#live-prediction");
+const probabilityRows = classNames.map(name => {
+    const row = document.createElement("div");
+    row.className = "probability-row";
+
+    row.innerHTML = 
+        `<div class="probability-label">
+            <span>${name}</span>
+            <span class="probability-value">0%</span>
+        </div>
+        <div class="probability-track" aria-hidden="true">
+            <div class="probability-fill"></div>
+        </div>`;
+        document.querySelector("#probability-bars").append(row);
+        return {
+            value: row.querySelector(".probability-value"),
+            fill: row.querySelector(".probability-fill"),
+        };
+});
 
 let stream = null;
 let detector = null;
@@ -23,7 +41,7 @@ function stopCamera() {
     const wasActive = Boolean(stream) || cameraStarting;
     cameraRequest += 1;
     faceContext.clearRect(0,0,48,48);
-    livePrediction.textContent = "No live Predicition";
+    renderProbabilities(null, "Camera is off.");
     window.clearInterval(detectionTimer);
     detectionTimer = null;
     overlayContext.clearRect(0, 0, overlay.width, overlay.height);
@@ -122,7 +140,7 @@ async function detectFace() {
         if (faces.length === 0) {
             cameraStatus.textContent = "No face detected.";
             faceContext.clearRect(0,0,48,48);
-            livePrediction.textContent = "No face detected.";
+            renderProbabilities(null, "No face detected.");
             return;
         }
 
@@ -162,21 +180,24 @@ function predictDetectedFace(box) {
     );
 
     const probabilities = predictExpression(faceCanvas);
+    renderProbabilities(probabilities);
+}
+
+function renderProbabilities(probabilities = null, message = "Waiting for a face.") {
+    probabilityRows.forEach((row, index) => {
+        const percentage = (probabilities?.[index] ?? 0) * 100;
+        row.value.textContent = `${percentage.toFixed(1)}%`;
+        row.fill.style.width = `${percentage}%`
+    });
+
+    if (!probabilities) {
+        livePrediction.textContent = message;
+        return;
+    }
+
     const bestIndex = probabilities.indexOf(Math.max(...probabilities));
 
-    livePrediction.textContent = [
-    `Prediction: ${classNames[bestIndex]} ` +
-        `(${(probabilities[bestIndex] * 100).toFixed(2)}%)`,
-    "",
-    ...classNames.map((name, index) =>
-        `${name}: ${(probabilities[index] * 100).toFixed(2)}%`
-    ),
-    "",
-    `Probability sum: ${
-        probabilities.reduce((total, value) => total + value, 0)
-        .toFixed(4)
-    }`,
-    ].join("\n");
+    livePrediction.textContent = `${classNames[bestIndex]} - ` + `${(probabilities[bestIndex] * 100).toFixed(1)}%`;
 }
 
 startButton.addEventListener("click", startCamera);

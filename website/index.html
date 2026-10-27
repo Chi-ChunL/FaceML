@@ -22,14 +22,18 @@
                     <button id="stop-camera" class="pixel-button" disabled>Stop</button>
                 </div>
                 <p id="camera-status">Camera is off.</p>
-                <div style="position: relative; width: 640px; max-width: 100%; transform: scaleX(-1);">
-                    <video id="webcam" autoplay muted playsinline width="640" style="width: 100%; display: block;"></video>
-                    <canvas id="face-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                <div class="demo-layout">
+                    <div class="camera-view">
+                        <video id="webcam" autoplay muted playsinline width="640"></video>
+                        <canvas id="face-overlay"></canvas>
+                    </div>
+                    <section class="expression-panel" aria-label="Expression probabilities">
+                        <h3>Expressions</h3>
+                        <p id="live-prediction">Waiting for a face.</p>
+                        <div id="probability-bars"></div>
+                    </section>
                 </div>
-                <p>Face crop:</p>
-                <canvas id="face-crop" width="48" height="48" style="width: 144px; height: 144px;"></canvas>
-                <pre id="live-prediction">No live prediction.</pre>
-                <label for="image-upload">Choose a cropped face image:</label>
+                <canvas id="face-crop" width="48" height="48" hidden></canvas>
                 <input id="image-upload" type="file" accept="image/*" disabled>
 
                 <br>
