@@ -25,36 +25,83 @@ let canEnterPlanet = false;
 let angle = 0;
 let vx = 0;
 let vy = 0;
-
+let launching = false;
+let launchAnimation = null;
+let pauseAfterLaunch = false;
 
 let x = (document.documentElement.clientWidth - ship.offsetWidth) / 2;
 let y = city.offsetTop + city.offsetHeight - ship.offsetHeight - 24;
 let previousTime = performance.now()
 
 
-launchButton.addEventListener("click", () => {
-    if (!demo.hidden) return;
+launchButton.addEventListener("click", async () => {
+    if (!demo.hidden || launching) return;
 
+    launching = true;
+    pauseAfterLaunch = false;
+    launchButton.disabled = true;
     launchButton.textContent = "Relaunch rocket";
+
     keys.clear();
     vx = 0;
     vy = 0;
-    angle  = 0;
+    angle = 0;
     canEnterPlanet = false;
     planetPrompt.hidden = true;
 
-    x = (document.documentElement.clientWidth - ship.offsetWidth) / 2;
-    y = city.offsetTop + city.offsetHeight - ship.offsetHeight - 24;
+    city.scrollIntoView({
+        behavior: "instant",
+        block: "start",
+    });
 
-    ship.style.left = `${x}px`;
-    ship.style.top = `${y}px`;
+    const screenLeft =
+        (document.documentElement.clientWidth - ship.offsetWidth) / 2;
+
+    const finishTop = Math.max(0, Math.min(
+        window.innerHeight * 0.75 - ship.offsetHeight / 2,
+        window.innerHeight - ship.offsetHeight - 24
+    ));
+
+    ship.style.position = "fixed";
+    ship.style.left = `${screenLeft}px`;
+    ship.style.top = `${finishTop}px`;
     ship.style.transform = "rotate(0deg)";
     ship.style.visibility = "visible";
+    ship.classList.add("is-thrusting");
+    ship.focus({ preventScroll: true });
+
+    launchAnimation = ship.animate([
+        {
+            transform:
+                `translateY(${window.innerHeight + 16 - finishTop}px)`,
+        },
+        { transform: "translateY(0)" },
+    ], {
+        duration: window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches ? 1 : 1200,
+        easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+    });
+
+    await launchAnimation.finished;
+
+    x = screenLeft + window.scrollX;
+    y = finishTop + window.scrollY;
+
+    ship.style.position = "absolute";
+    ship.style.left = `${x}px`;
+    ship.style.top = `${y}px`;
     ship.classList.remove("is-thrusting");
 
-    city.scrollIntoView({behavior: "instant", block: "start"});
+    launching = false;
+    launchAnimation = null;
+    launchButton.disabled = false;
 
-    ship.focus({ preventScroll: true });
+    if (pauseAfterLaunch) {
+        launchButton.focus({ preventScroll: true });
+    } else {
+        ship.focus({ preventScroll: true });
+    }
 });
 
 ship.addEventListener("click", () => {
@@ -63,8 +110,20 @@ ship.addEventListener("click", () => {
 });
 
 ship.addEventListener("keydown", event => {
-    if (event.ctrlKey || event.repeat) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
     
+    if (launching) {
+        if (movementKeys.includes(event.code) || event.code == "Escape") {
+            event.preventDefault();
+        }
+
+        if (event.code === "Escape") {
+            pauseAfterLaunch = true;
+            launchAnimation?.finish();
+        }
+        return;
+    }
+
     if (event.code === "KeyF") {
         event.preventDefault();
 
@@ -96,7 +155,7 @@ ship.addEventListener("blur", () => keys.clear());
 window.addEventListener("blur", () => keys.clear());
 
 function enterPlanet() {
-    if (!demo.hidden) return;
+    if (!demo.hidden || launching) return;
 
     canEnterPlanet = false;
     planetPrompt.hidden = true;
@@ -137,6 +196,10 @@ function touchesPlanet(width, height, sin, cos) {
 function updateFlight(time) {
     const deltaTime = Math.min((time - previousTime) / 1000, 0.05);
     previousTime = time;
+    if (launching) {
+        requestAnimationFrame(updateFlight);
+        return;
+    }
 
     const right = keys.has("KeyD") || keys.has("ArrowRight");
     const left = keys.has("KeyA") || keys.has("ArrowLeft");

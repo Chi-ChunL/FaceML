@@ -334,3 +334,45 @@ a {
         grid-template-columns: 1fr;
     }
 }
+#launch-flight {
+    width: 256px;
+    height: 64px;
+    justify-self: center;
+    box-sizing: border-box;
+    padding: 0 16px;
+    border: 0;
+
+    font: inherit;
+    color: #fffdf2;
+    background: transparent url("./assets/buttons/flashing-launch-sheet.png") 0 0 / 3072px 64px no-repeat;
+    image-rendering: pixelated;
+    animation: launch-shine 4s steps(12, end) infinite;
+}
+
+#launch-flight:hover:not(:disabled) {
+    filter: brightness(1.15);
+}
+
+#launch-flight:active:not(:disabled) {
+    transform: translateY(2px);
+}
+
+#launch-flight:focus-visible {
+    outline: 2px solid #b591c6;
+    outline-offset: 4px;
+}
+
+@keyframes launch-shine {
+    0%, 72.5% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: -3072px 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #launch-flight {
+        animation: none;
+    }
+}
