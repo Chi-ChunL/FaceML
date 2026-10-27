@@ -1,5 +1,5 @@
 import * as tf from "@tensorflow/tfjs";
-import { stopCamera, renderProbabilities } from "./camera.js";
+import { stopCamera, renderProbabilities, isCurrentMediaRequest } from "./camera.js";
 import { classNames, loadExpressionModel, predictExpression } from "./model.js";
 import "./cursor.js";
 import "./style.css";
@@ -42,7 +42,7 @@ imageUpload.addEventListener("change", async () => {
     const file = imageUpload.files[0];
     if (!file || !model) return;
 
-    stopCamera();
+    const imageRequest = stopCamera();
     imageUpload.disabled = true;
     uploadButton.disabled = true;
     status.textContent = "Predicting..";
@@ -52,7 +52,14 @@ imageUpload.addEventListener("change", async () => {
     try {
         preview.src = imageUrl;
         await preview.decode();
+        if (!isCurrentMediaRequest(imageRequest)) {
+            status.textContent = "";
+            return;
+        }
+        document.querySelector("#webcam").hidden = true;
+        document.querySelector("#face-overlay").hidden = true;
         preview.hidden = false;
+        document.querySelector("#camera-status").textContent = "Showing uploaded image.";
 
         const canvas = document.createElement("canvas");
         canvas.width = 48;
@@ -66,6 +73,10 @@ imageUpload.addEventListener("change", async () => {
         renderProbabilities(probabilities);
         status.textContent = "";
     } catch (error) {
+        if (!isCurrentMediaRequest(imageRequest)) {
+            status.textContent = "";
+            return;
+        }
         console.error(error);
         status.textContent = `Prediction failed:\n${error.message}`;
     } finally {

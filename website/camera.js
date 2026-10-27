@@ -11,6 +11,8 @@ const overlayContext = overlay.getContext("2d");
 const faceCanvas = document.querySelector("#face-crop");
 const faceContext = faceCanvas.getContext("2d");
 const livePrediction = document.querySelector("#live-prediction");
+const preview = document.querySelector("#preview");
+
 const probabilityRows = classNames.map(name => {
     const row = document.createElement("div");
     row.className = "probability-row";
@@ -51,19 +53,32 @@ export function stopCamera() {
     }
 
     video.srcObject = null;
+    preview.hidden = true;
+    video.hidden = false;
+    overlay.hidden = false;
     if (wasActive) {
         startButton.disabled = cameraStarting;
     }
     stopButton.disabled = true;
     cameraStatus.textContent = "Camera is off.";
+    return cameraRequest;
+}
+
+export function isCurrentMediaRequest(request) {
+    return request === cameraRequest;
 }
 
 async function startCamera() {
     if (cameraStarting || stream) return;
-
+    
+    preview.hidden = true;
+    video.hidden = false;
+    overlay.hidden = false;
+    renderProbabilities(null, "Waiting for a face.");
     cameraStarting = true;
     const request = ++cameraRequest;
     startButton.disabled = true;
+
     try {
         if (!detector) {
             cameraStatus.textContent = "Loading the face detector...";

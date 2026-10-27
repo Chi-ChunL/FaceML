@@ -31,9 +31,34 @@ let x = (document.documentElement.clientWidth - ship.offsetWidth) / 2;
 let y = city.offsetTop + city.offsetHeight - ship.offsetHeight - 24;
 let previousTime = performance.now()
 
+
 launchButton.addEventListener("click", () => {
     if (!demo.hidden) return;
+
+    launchButton.textContent = "Relaunch rocket";
+    keys.clear();
+    vx = 0;
+    vy = 0;
+    angle  = 0;
+    canEnterPlanet = false;
+    planetPrompt.hidden = true;
+
+    x = (document.documentElement.clientWidth - ship.offsetWidth) / 2;
+    y = city.offsetTop + city.offsetHeight - ship.offsetHeight - 24;
+
+    ship.style.left = `${x}px`;
+    ship.style.top = `${y}px`;
+    ship.style.transform = "rotate(0deg)";
     ship.style.visibility = "visible";
+    ship.classList.remove("is-thrusting");
+
+    city.scrollIntoView({behavior: "instant", block: "start"});
+
+    ship.focus({ preventScroll: true });
+});
+
+ship.addEventListener("click", () => {
+    if(!demo.hidden) return;
     ship.focus({ preventScroll: true });
 });
 
@@ -44,17 +69,7 @@ ship.addEventListener("keydown", event => {
         event.preventDefault();
 
         if (!canEnterPlanet || event.repeat) return;
-        canEnterPlanet = false;
-        planetPrompt.hidden = true;
-        vx = 0;
-        vy = 0;
-        keys.clear()
-
-        ship.classList.remove("is-thrusting");
-        ship.style.visibility = "hidden";
-        ship.blur();
-
-        window.dispatchEvent(new Event("spaceml-landed"));
+        enterPlanet();
         return;
     }
     if (event.code == "Escape") {
@@ -79,6 +94,24 @@ ship.addEventListener("keyup", event => {
 
 ship.addEventListener("blur", () => keys.clear());
 window.addEventListener("blur", () => keys.clear());
+
+function enterPlanet() {
+    if (!demo.hidden) return;
+
+    canEnterPlanet = false;
+    planetPrompt.hidden = true;
+    keys.clear();
+    vx = 0;
+    vy = 0;
+
+    ship.classList.remove("is-thrusting");
+    ship.style.visibility = "hidden";
+    ship.blur();
+
+    window.dispatchEvent(new Event("spaceml-landed"));
+}
+
+planet.addEventListener("click", enterPlanet);
 
 function touchesPlanet(width, height, sin, cos) {
     const bounds = planet.getBoundingClientRect();

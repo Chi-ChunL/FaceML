@@ -12,7 +12,7 @@
     <section id="projects" class="space-section">
         <h1>Projects</h1>
         <article class="project-card">
-            <div id="spaceml-planet" role="img" aria-label="SpaceML smilling face planet"></div>
+            <button id="spaceml-planet" type="button" aria-label="Open SpaceML" title="Open SpaceML"></button>
             <h2>SpaceML</h2>
             <p>Explore facial recognition prediction using your webcam or an uploaded face image.</p>
             <div id="faceml-demo" hidden>
@@ -27,6 +27,7 @@
                 <div class="demo-layout">
                     <div class="camera-view">
                         <video id="webcam" autoplay muted playsinline width="640"></video>
+                        <img id="preview" width="192" alt="Selected face" hidden>
                         <canvas id="face-overlay"></canvas>
                     </div>
                     <section class="expression-panel" aria-label="Expression probabilities">
@@ -39,7 +40,6 @@
                 <input id="image-upload" type="file" accept="image/*" hidden disabled>
 
                 <br>
-                <img id="preview" width="192" alt="Selected face" hidden>
             </div>
         </article>
     </section>
