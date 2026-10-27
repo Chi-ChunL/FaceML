@@ -101,6 +101,10 @@ button, input {
     font: inherit;
 }
 
+#status:empty {
+    display: none;
+}
+
 a {
     color: #ffffff;
 }

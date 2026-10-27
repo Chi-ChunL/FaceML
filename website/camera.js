@@ -37,7 +37,7 @@ let detectionTimer = null;
 let cameraRequest = 0;
 let cameraStarting = false;
 
-function stopCamera() {
+export function stopCamera() {
     const wasActive = Boolean(stream) || cameraStarting;
     cameraRequest += 1;
     faceContext.clearRect(0,0,48,48);
@@ -183,7 +183,7 @@ function predictDetectedFace(box) {
     renderProbabilities(probabilities);
 }
 
-function renderProbabilities(probabilities = null, message = "Waiting for a face.") {
+export function renderProbabilities(probabilities = null, message = "Waiting for a face.") {
     probabilityRows.forEach((row, index) => {
         const percentage = (probabilities?.[index] ?? 0) * 100;
         row.value.textContent = `${percentage.toFixed(1)}%`;

@@ -1,5 +1,5 @@
 import * as tf from "@tensorflow/tfjs";
-import "./camera.js";
+import { stopCamera, renderProbabilities } from "./camera.js";
 import { classNames, loadExpressionModel, predictExpression } from "./model.js";
 import "./cursor.js";
 import "./style.css";
@@ -7,6 +7,7 @@ import "./flight.js";
 
 const status = document.querySelector("#status");
 const imageUpload = document.querySelector("#image-upload");
+const uploadButton = document.querySelector("#upload-button");
 const preview = document.querySelector("#preview");
 
 let model;
@@ -23,14 +24,14 @@ async function main() {
             return Array.from(output.dataSync());
         });
         const probabilitySum = probabilities.reduce((total, probability) => total + probability, 0);
-        status.textContent = [
-        "Model loaded and prediction completed!",
-        `Input shape: ${JSON.stringify(model.inputs[0].shape)}`,
-        `Output shape: ${JSON.stringify(model.outputs[0].shape)}`,
-        `Number of probabilities: ${probabilities.length}`,
-        `Probability sum: ${probabilitySum.toFixed(4)}`,
-        ].join("\n");
+        console.info("Model ready.", {
+            inputShape: model.inputs[0].shape,
+            outputShape: model.outputs[0].shape,
+            probabilitySum,
+        });
+        status.textContent = "";
         imageUpload.disabled = false;
+        uploadButton.disabled = false;
         document.querySelector("#start-camera").disabled = false;
         } catch (error) {
         console.error(error);
@@ -41,7 +42,9 @@ imageUpload.addEventListener("change", async () => {
     const file = imageUpload.files[0];
     if (!file || !model) return;
 
+    stopCamera();
     imageUpload.disabled = true;
+    uploadButton.disabled = true;
     status.textContent = "Predicting..";
 
     const imageUrl = URL.createObjectURL(file);
@@ -60,22 +63,16 @@ imageUpload.addEventListener("change", async () => {
 
         const probabilities = predictExpression(canvas);
 
-        const bestIndex = probabilities.indexOf(Math.max(...probabilities));
-        const probabilitySum = probabilities.reduce((total, probability) => total + probability, 0);
-        status.textContent = [`Prediction: ${(classNames[bestIndex])} ` + `${(probabilities[bestIndex] * 100).toFixed(2)}%)`,
-        "",
-        ...classNames.map((name, index) => 
-            `${name}: ${(probabilities[index] * 100).toFixed(2)}%`,
-        ),
-        "",
-        `Probability sum: ${probabilitySum.toFixed(4)}`,
-    ].join("\n");
+        renderProbabilities(probabilities);
+        status.textContent = "";
     } catch (error) {
         console.error(error);
         status.textContent = `Prediction failed:\n${error.message}`;
     } finally {
         URL.revokeObjectURL(imageUrl);
         imageUpload.disabled = false;
+        uploadButton.disabled = false;
+        imageUpload.value = "";
     }
 });
 
@@ -118,4 +115,8 @@ window.addEventListener("keydown", event => {
     faceMLDemo.hidden = true;
 
     window.dispatchEvent(new Event("spaceml-exited"));
+});
+
+uploadButton.addEventListener("click", () => {
+    imageUpload.click();
 });

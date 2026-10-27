@@ -18,9 +18,11 @@
             <div id="faceml-demo" hidden>
                 <button id="leave-planet" type="button" aria-label="Return to space" title="Return tp space (Esc)"></button>
                 <div class="camera-controls">
+                    <button id="upload-button" class="pixel-button" type="button">Upload image</button>
                     <button id="start-camera" class="pixel-button" disabled>Start Camera</button>
                     <button id="stop-camera" class="pixel-button" disabled>Stop</button>
                 </div>
+                <p id="status" role="status">Loading the model...</p>
                 <p id="camera-status">Camera is off.</p>
                 <div class="demo-layout">
                     <div class="camera-view">
@@ -34,11 +36,10 @@
                     </section>
                 </div>
                 <canvas id="face-crop" width="48" height="48" hidden></canvas>
-                <input id="image-upload" type="file" accept="image/*" disabled>
+                <input id="image-upload" type="file" accept="image/*" hidden disabled>
 
                 <br>
                 <img id="preview" width="192" alt="Selected face" hidden>
-                <pre id="status">Loading the model...</pre>
             </div>
         </article>
     </section>
