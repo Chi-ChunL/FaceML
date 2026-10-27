@@ -6,9 +6,12 @@ const demo = document.querySelector("#faceml-demo");
 
 const keys = new Set();
 const movementKeys = ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"];
-const speed = 240;
+const speed = 350;
 const turnSpeed = 180;
+const planetPrompt = document.querySelector("#planet-prompt");
+let canEnterPlanet = false;
 let angle = 0;
+
 
 let x = (document.documentElement.clientWidth - ship.offsetWidth) / 2;
 let y = city.offsetTop + city.offsetHeight - ship.offsetHeight - 24;
@@ -21,6 +24,23 @@ launchButton.addEventListener("click", () => {
 });
 
 ship.addEventListener("keydown", event => {
+    if (event.ctrlKey || event.repeat) return;
+    
+    if (event.code === "KeyF") {
+        event.preventDefault();
+
+        if (!canEnterPlanet || event.repeat) return;
+        canEnterPlanet = false;
+        planetPrompt.hidden = true;
+        keys.clear()
+
+        ship.classList.remove("is-thrusting");
+        ship.style.visibility = "hidden";
+        ship.blur();
+
+        window.dispatchEvent(new Event("spaceml-landed"));
+        return;
+    }
     if (event.code == "Escape") {
         keys.clear();
         launchButton.focus({preventScroll: true});
@@ -98,14 +118,8 @@ function updateFlight(time) {
     ship.style.top = `${y}px`;
     ship.style.transform = `rotate(${angle}deg)`
 
-    if (document.activeElement === ship && demo.hidden && touchesPlanet(width, height, sin, cos)) {
-        keys.clear();
-        ship.classList.remove("is-thrusting");
-        ship.style.visibility = "hidden";
-        ship.blur();
-
-        window.dispatchEvent(new Event("spaceml-landed"));
-    }
+    canEnterPlanet = document.activeElement === ship && demo.hidden && touchesPlanet(width, height, sin, cos)
+    planetPrompt.hidden = !canEnterPlanet;
 
     if (document.activeElement === ship) {
         const shipCenterY = y + ship.offsetHeight / 2;
@@ -136,3 +150,17 @@ function updateFlight(time) {
 }
 
 requestAnimationFrame(updateFlight);
+
+window.addEventListener("spaceml-exited", () =>{
+    keys.clear();
+    ship.classList.remove("is-thrusting");
+    ship.style.visibility = "visible";
+
+    ship.scrollIntoView({
+        behavior: "instant",
+        block: "center",
+    });
+
+    ship.focus({ preventScroll: true })
+});
+

@@ -102,3 +102,16 @@ window.addEventListener("spaceml-landed", () => {
         block: "start",
     });
 });
+
+window.addEventListener("keydown", event => {
+    if(
+        event.code !== "Escape" ||
+        event.repeat ||
+        event.defaultPrevented ||
+        faceMLDemo.hidden
+    ) return;
+    event.preventDefault()
+    faceMLDemo.hidden = true;
+
+    window.dispatchEvent(new Event("spaceml-exited"));
+});

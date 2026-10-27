@@ -16,8 +16,12 @@ let stream = null;
 let detector = null;
 let detectionBusy = false;
 let detectionTimer = null;
+let cameraRequest = 0;
+let cameraStarting = false;
 
 function stopCamera() {
+    const wasActive = Boolean(stream) || cameraStarting;
+    cameraRequest += 1;
     faceContext.clearRect(0,0,48,48);
     livePrediction.textContent = "No live Predicition";
     window.clearInterval(detectionTimer);
@@ -29,19 +33,25 @@ function stopCamera() {
     }
 
     video.srcObject = null;
-    startButton.disabled = false;
+    if (wasActive) {
+        startButton.disabled = cameraStarting;
+    }
     stopButton.disabled = true;
     cameraStatus.textContent = "Camera is off.";
 }
 
 async function startCamera() {
-    startButton.disabled = true;
-    cameraStatus.textContent = "Waiting for camera access...";
+    if (cameraStarting || stream) return;
 
+    cameraStarting = true;
+    const request = ++cameraRequest;
+    startButton.disabled = true;
     try {
         if (!detector) {
             cameraStatus.textContent = "Loading the face detector...";
             await tf.ready();
+
+            if (request !== cameraRequest) return;
 
             detector = await loadFaceDetector(
                 {
@@ -53,7 +63,7 @@ async function startCamera() {
         }
 
         cameraStatus.textContent = "Waiting for camera access...";
-        stream = await navigator.mediaDevices.getUserMedia({
+        const nextStream = await navigator.mediaDevices.getUserMedia({
             video: {
                 width: { ideal: 640},
                 height: { ideal:480 },
@@ -61,8 +71,17 @@ async function startCamera() {
             },
             audio: false,
         });
+
+        if (request !== cameraRequest) {
+            nextStream.getTracks().forEach(track => track.stop());
+            return;
+        }
+        stream = nextStream
         video.srcObject = stream;
         await video.play();
+
+        if (request !== cameraRequest) return;
+
         overlay.width = video.videoWidth;
         overlay.height = video.videoHeight;
         detectionTimer = window.setInterval(detectFace, 100);
@@ -79,6 +98,12 @@ async function startCamera() {
             cameraStatus.textContent = "No camera was found. Bro go get a cam.";
         } else {
             cameraStatus.textContent = `Camera failed: ${error.message}`;
+        }
+    } finally {
+        cameraStarting = false;
+
+        if (!stream) {
+            startButton.disabled = false;
         }
     }
 }
@@ -156,3 +181,4 @@ function predictDetectedFace(box) {
 startButton.addEventListener("click", startCamera);
 stopButton.addEventListener("click", stopCamera);
 window.addEventListener("pagehide", stopCamera);
+window.addEventListener("spaceml-exited", stopCamera);

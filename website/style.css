@@ -84,6 +84,7 @@ body {
 
 #faceml-demo {
     margin-top: 24px;
+    outline: none;
 }
 
 button, input {
@@ -149,4 +150,24 @@ a {
     background-repeat: no-repeat;
 
     image-rendering: pixelated;
+}
+
+#planet-prompt {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    z-index: 30;
+
+    width: max-content;
+    max-width: calc(100vh - 32px);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 12px 20px;
+
+    background: rgba(22, 13, 38, 0.95);
+    border: 2px solid #b591c6;
+    color: #ffffff;
+    text-align: center;
+    pointer-events: none;
 }
