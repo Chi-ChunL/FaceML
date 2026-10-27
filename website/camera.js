@@ -61,7 +61,7 @@ async function startCamera() {
                 }
             );
         }
-
+        if (request !== cameraRequest) return;
         cameraStatus.textContent = "Waiting for camera access...";
         const nextStream = await navigator.mediaDevices.getUserMedia({
             video: {
@@ -89,6 +89,7 @@ async function startCamera() {
         stopButton.disabled = false;
         cameraStatus.textContent = "Camera is on.";
     } catch (error)  {
+        if (request !== cameraRequest) return;
         stopCamera();
         console.error(error);
 

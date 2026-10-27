@@ -3,14 +3,28 @@ const launchButton = document.querySelector("#launch-flight");
 const city = document.querySelector("#city");
 const planet = document.querySelector("#spaceml-planet");
 const demo = document.querySelector("#faceml-demo");
+const planetPrompt = document.querySelector("#planet-prompt");
 
 const keys = new Set();
 const movementKeys = ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"];
-const speed = 350;
-const turnSpeed = 180;
-const planetPrompt = document.querySelector("#planet-prompt");
+const speed = 400;
+const thrust = 200;
+const drag = 0.1;
+const bounce = 0.6;
+const turnSpeed = 150;
+const hull = [
+    [0, -64],          
+    [19, -42], [19, -12],   
+    [32, 8], [32, 22],     
+    [0, 24],               
+    [-32, 22], [-32, 8],    
+    [-19, -12], [-19, -42], 
+];
+
 let canEnterPlanet = false;
 let angle = 0;
+let vx = 0;
+let vy = 0;
 
 
 let x = (document.documentElement.clientWidth - ship.offsetWidth) / 2;
@@ -32,6 +46,8 @@ ship.addEventListener("keydown", event => {
         if (!canEnterPlanet || event.repeat) return;
         canEnterPlanet = false;
         planetPrompt.hidden = true;
+        vx = 0;
+        vy = 0;
         keys.clear()
 
         ship.classList.remove("is-thrusting");
@@ -42,7 +58,11 @@ ship.addEventListener("keydown", event => {
         return;
     }
     if (event.code == "Escape") {
+        event.preventDefault();
+        
         keys.clear();
+        vx = 0;
+        vy = 0;
         launchButton.focus({preventScroll: true});
         return;
     }
@@ -95,8 +115,27 @@ function updateFlight(time) {
     const sin = Math.sin(radians);
     const cos = Math.cos(radians);
 
-    x += sin * throttle * speed * deltaTime;
-    y -= cos * throttle * speed * deltaTime;
+    vx += sin * throttle * thrust * deltaTime;
+    vy -= cos * throttle * thrust * deltaTime;
+
+    const down = keys.has("KeyS") || keys.has("ArrowDown")
+    if (down) {
+        const brake = Math.exp(-3 * deltaTime);
+        vx *= brake;
+        vy *= brake;
+    }
+    const damping = Math.exp(-drag * deltaTime)
+    vx *= damping;
+    vy *= damping;
+
+    const currentSpeed = Math.hypot(vx, vy);
+    if (currentSpeed > speed) {
+        vx *= speed / currentSpeed;
+        vy *= speed / currentSpeed;
+    }
+
+    x += vx * deltaTime;
+    y += vy * deltaTime;
 
     const width = ship.offsetWidth;
     const height = ship.offsetHeight;
@@ -111,8 +150,20 @@ function updateFlight(time) {
     const maxX = document.documentElement.clientWidth - width - paddingX;
     const maxY = worldHeight - height - paddingY;
 
-    x = Math.max(paddingX, Math.min(x, maxX));
-    y = Math.max(paddingY, Math.min(y, maxY));
+    if (x < paddingX) {
+        x= paddingX;
+        vx = Math.abs(vx) * bounce;
+    } else if (x > maxX) {
+        x = maxX;
+        vx = -Math.abs(vx) * bounce;
+    }
+    if (y < paddingY) {
+        y = paddingY;
+        vy = Math.abs(vy) * bounce;
+    } else if (y > maxY) {
+        y = maxY;
+        vy = -Math.abs(vy) * bounce;
+    }
 
     ship.style.left = `${x}px`;
     ship.style.top = `${y}px`;
@@ -123,8 +174,8 @@ function updateFlight(time) {
 
     if (document.activeElement === ship) {
         const shipCenterY = y + ship.offsetHeight / 2;
-        const upperLimit = window.innerHeight * 0.25;
-        const lowerLimit = window.innerHeight * 0.75;
+        const upperLimit = window.innerHeight * 0.30;
+        const lowerLimit = window.innerHeight * 0.65;
 
         const screenY = shipCenterY - window.scrollY;
         let targetScroll = window.scrollY;
@@ -153,6 +204,8 @@ requestAnimationFrame(updateFlight);
 
 window.addEventListener("spaceml-exited", () =>{
     keys.clear();
+    vx = 0;
+    vy = 0; 
     ship.classList.remove("is-thrusting");
     ship.style.visibility = "visible";
 
