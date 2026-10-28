@@ -8,6 +8,15 @@ const status = document.querySelector("#status");
 const imageUpload = document.querySelector("#image-upload");
 const uploadButton = document.querySelector("#upload-button");
 const preview = document.querySelector("#preview");
+const certificateButton = document.querySelector("#claim-certificate");
+const certificateCanvas = document.querySelector("#certificate-preview");
+const certificateContext = certificateCanvas.getContext("2d");
+const certificateStatus = document.querySelector("#certificate-status");
+const capturedPortrait = document.querySelector("#astronaut-portrait");
+const certificateBackground = new Image();
+certificateBackground.src = new URL("./assets/mini-deco/certificate.png", import.meta.url).href;
+
+
 
 let model;
 
@@ -157,4 +166,35 @@ window.addEventListener("keydown", event => {
 
 uploadButton.addEventListener("click", () => {
     imageUpload.click();
+});
+
+certificateButton.addEventListener("click", async () => {
+    if (capturedPortrait.hidden) {
+        certificateStatus.textContent = "Take your portrait in SpaceML first.";
+        return;
+    }
+
+    certificateButton.disabled = true;
+
+    try {
+        await certificateBackground.decode();
+        await document.fonts.ready;
+
+        certificateContext.clearRect(0, 0, 768, 512);
+        certificateContext.imageSmoothingEnabled = false;
+        certificateContext.drawImage(certificateBackground, 0, 0, 768, 512);
+        certificateContext.fillStyle = "#FCF7EF";
+        certificateContext.font = "32px Pixelify Sans";
+        certificateContext.textAlign = "center";
+        certificateContext.textBaseline = "middle";
+        certificateContext.fillText("Space Explorer", 384, 292);
+        certificateContext.drawImage(capturedPortrait, 32, 352, 128, 128);
+        certificateCanvas.hidden = false;
+        certificateStatus.textContent = "Certified by StarWeb";
+    } catch (error) {
+        console.error(error);
+        certificateStatus.textContent = "The certificate couldnt be created.";
+    } finally {
+        certificateButton.disabled = false;
+    }
 });

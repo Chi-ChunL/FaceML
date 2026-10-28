@@ -614,3 +614,15 @@ html {
 #farewell p {
     color: #b591c6;
 }
+
+#certificate-preview {
+    display: block;
+    width: min(768px, 100%);
+    min-width: 0;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+#certificate-preview[hidden] {
+    display: none;
+}
