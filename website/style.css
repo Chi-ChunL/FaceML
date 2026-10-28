@@ -678,3 +678,16 @@ html {
     font-size: 18px;
     white-space: nowrap;
 }
+
+.flight-hints {
+    margin: 14px auto 0;
+    display: grid;
+    gap: 6px;
+    font-size: 16px;
+    line-height: 1.5;
+    color:#eee4f3;
+}
+
+.flight-hints p {
+    margin: 0;
+}
