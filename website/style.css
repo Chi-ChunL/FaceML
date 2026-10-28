@@ -464,3 +464,76 @@ body.is-loading > section {
     color: #b591c6;
     text-shadow: none;
 }
+
+.personal-section {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 24px;
+    text-align: center;
+}
+
+.personal-section h2 {
+    margin: 0;
+}
+
+.social-planets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 48px;
+    width: 100%;
+}
+
+.planet-entry {
+    display: grid;
+    justify-items: center;
+    width: 288px;
+    max-width: 100%;
+    color: inherit;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.planet-entry img{
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+.planet-entry span {
+    margin-top: -24px;
+}
+
+.planet-entry:hover img,
+.planet-entry:focus-visible img {
+    filter: drop-shadow(0 0 6px #b591c6);
+}
+
+.planet-entry:focus-visible {
+    outline: 2px solid #b591c6;
+    outline-offset: 4px;
+}
+
+.planet-card {
+    width: min(560px, 100%);
+}
+
+summary.planet-entry {
+    margin: 0 auto;
+    list-style: none;
+}
+
+summary.planet-entry::-webkit-details-marker {
+    display: none;
+}
+
+.about-text {
+    margin-top: 24px;
+    padding: 20px;
+    border: 2px solid #8c5aa6;
+    background: #160d26;
+    line-height: 1.6;
+    text-align: left;
+}

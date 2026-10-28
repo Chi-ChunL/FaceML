@@ -171,7 +171,19 @@ function enterPlanet() {
 }
 
 planet.addEventListener("click", enterPlanet);
+document.querySelectorAll(".planet-entry").forEach(entry => {
+    entry.addEventListener("click", event => {
+        if (launching) {
+            event.preventDefault();
+            return;
+        }
 
+        keys.clear();
+        vx = 0;
+        vy = 0;
+        ship.classList.remove("is-thrusting");
+    });
+});
 function touchesPlanet(width, height, sin, cos) {
     const bounds = planet.getBoundingClientRect();
     const planetX = bounds.left + bounds.width / 2 + window.scrollX;
