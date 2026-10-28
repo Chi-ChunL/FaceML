@@ -4,6 +4,36 @@ const city = document.querySelector("#city");
 const planet = document.querySelector("#spaceml-planet");
 const demo = document.querySelector("#faceml-demo");
 const planetPrompt = document.querySelector("#planet-prompt");
+const destinations = [
+    {
+        element: planet,
+        name: "SpaceML",
+        centerX: 0.5,
+        centerY: 0.5,
+        radius: 0.5,
+    },
+    {
+        element: document.querySelector("#homeworld-planet"),
+        name: "My homeworld",
+        centerX: 45.5 / 96,
+        centerY: 47 / 96,
+        radius: 32.5 / 96,
+    },
+    {
+        element: document.querySelector("#github-planet"),
+        name: "GitHub",
+        centerX: 46 / 96,
+        centerY: 43 / 96,
+        radius: 32 / 96,
+    },
+    {
+        element: document.querySelector("#youtube-planet"),
+        name: "YouTube",
+        centerX: 48 / 96,
+        centerY: 46 / 96,
+        radius: 32 / 96,
+    },
+];
 
 const keys = new Set();
 const movementKeys = ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"];
@@ -21,7 +51,7 @@ const hull = [
     [-19, -12], [-19, -42], 
 ];
 
-let canEnterPlanet = false;
+let activePlanet = null;
 let angle = 0;
 let vx = 0;
 let vy = 0;
@@ -46,7 +76,7 @@ launchButton.addEventListener("click", async () => {
     vx = 0;
     vy = 0;
     angle = 0;
-    canEnterPlanet = false;
+    activePlanet = null;
     planetPrompt.hidden = true;
 
     city.scrollIntoView({
@@ -127,8 +157,12 @@ ship.addEventListener("keydown", event => {
     if (event.code === "KeyF") {
         event.preventDefault();
 
-        if (!canEnterPlanet || event.repeat) return;
-        enterPlanet();
+        if (!activePlanet || event.repeat) return;
+        const destinations = activePlanet.element;
+        activePlanet = null;
+        planetPrompt.hidden = true;
+        destinations.focus({ preventScroll: true });
+        destinations.click();
         return;
     }
     if (event.code == "Escape") {
@@ -157,7 +191,7 @@ window.addEventListener("blur", () => keys.clear());
 function enterPlanet() {
     if (!demo.hidden || launching) return;
 
-    canEnterPlanet = false;
+    activePlanet = null;
     planetPrompt.hidden = true;
     keys.clear();
     vx = 0;
@@ -184,15 +218,17 @@ document.querySelectorAll(".planet-entry").forEach(entry => {
         ship.classList.remove("is-thrusting");
     });
 });
-function touchesPlanet(width, height, sin, cos) {
-    const bounds = planet.getBoundingClientRect();
-    const planetX = bounds.left + bounds.width / 2 + window.scrollX;
-    const planetY = bounds.top + bounds.height / 2 + window.scrollY;
+function touchesPlanet(destination, width, height, sin, cos) {
+    const image = destination.element.querySelector("img");
+    const bounds = (image || destination.element).getBoundingClientRect();
+    const planetX = bounds.left + bounds.width * destination.centerX + window.scrollX;
+    const planetY = bounds.top + bounds.height * destination.centerY + window.scrollY;
+    const radius = bounds.width * destination.radius;
+
     const dx = planetX - (x + width / 2);
     const dy = planetY - (y + height / 2);
     const localX = dx * cos + dy * sin;
     const localY = -dx * sin + dy * cos;
-    const radius = bounds.width / 2;
 
     for (let i = 0; i < hull.length; i++) {
         const [ax, ay] = hull[i];
@@ -288,8 +324,18 @@ function updateFlight(time) {
     ship.style.top = `${y}px`;
     ship.style.transform = `rotate(${angle}deg)`
 
-    canEnterPlanet = document.activeElement === ship && demo.hidden && touchesPlanet(width, height, sin, cos)
-    planetPrompt.hidden = !canEnterPlanet;
+    activePlanet = null;
+    if (document.activeElement === ship && demo.hidden) {
+        activePlanet = destinations.find(destination => 
+            touchesPlanet(destination, width, height, sin, cos)
+        ) ?? null;
+    }
+
+    planetPrompt.hidden = !activePlanet;
+    if (activePlanet) {
+        const action = activePlanet.element.tagName === "A" ? "visit" : "enter";
+        planetPrompt.textContent = `Press F to ${action} ${activePlanet.name}`;
+    }
 
     if (document.activeElement === ship) {
         const shipCenterY = y + ship.offsetHeight / 2;
@@ -336,3 +382,11 @@ window.addEventListener("spaceml-exited", () =>{
     ship.focus({ preventScroll: true })
 });
 
+window.addEventListener("keydown", event => {
+    if (event.key !== "Enter" || event.repeat || event.defaultPrevented) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (launching || !demo.hidden || ship.style.visibility !== "visible") return;
+    event.preventDefault();
+    keys.clear()
+    ship.focus({ preventScroll: true });
+})

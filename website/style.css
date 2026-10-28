@@ -341,6 +341,7 @@ a {
     box-sizing: border-box;
     padding: 0 16px;
     border: 0;
+    outline: 0;
 
     font: inherit;
     color: #fffdf2;
@@ -348,6 +349,8 @@ a {
     image-rendering: pixelated;
     animation: launch-shine 4s steps(12, end) infinite;
 }
+
+
 
 #launch-flight:hover:not(:disabled) {
     filter: brightness(1.15);
@@ -536,4 +539,13 @@ summary.planet-entry::-webkit-details-marker {
     background: #160d26;
     line-height: 1.6;
     text-align: left;
+}
+
+#spaceml-planet:focus,
+.planet-entry:focus {
+    outline: none;
+}
+
+#spaceml-planet:focus-visible {
+    filter: drop-shadow(0 0 6px #b591c6);
 }
