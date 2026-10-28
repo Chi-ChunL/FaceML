@@ -374,7 +374,7 @@ a {
 
     font: inherit;
     color: #fffdf2;
-    background: transparent url("./assets/buttons/flashing-launch-Sheet.png") 0 0 / 3072px 64px no-repeat;
+    background: transparent url("./assets/buttons/flashing-launch-sheet.png") 0 0 / 3072px 64px no-repeat;
     image-rendering: pixelated;
     animation: launch-shine 4s steps(12, end) infinite;
 }
