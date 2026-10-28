@@ -536,10 +536,34 @@ summary.planet-entry::-webkit-details-marker {
 .about-text {
     margin-top: 24px;
     padding: 20px;
-    border: 2px solid #8c5aa6;
-    background: #160d26;
+    box-sizing: border-box;
+    border: 16px solid transparent;
+    border-image-source: url("./assets/background/spaceml-background.png");
+    border-image-slice: 8 fill;
+    border-image-repeat: stretch;
+    image-rendering: pixelated;
+    color: #fffdf2;
     line-height: 1.6;
     text-align: left;
+}
+
+.about-text h3 {
+    margin: 0 0 16px;
+    font-size: 28px;
+}
+.about-text p {
+    margin: 0 0 16px;
+}
+
+.about-text p:last-child {
+    margin-bottom: 0;
+}
+
+.about-text .dialogue-label {
+    color: #b591c6;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 #spaceml-planet:focus,
