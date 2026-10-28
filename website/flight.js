@@ -161,7 +161,6 @@ ship.addEventListener("keydown", event => {
         const destinations = activePlanet.element;
         activePlanet = null;
         planetPrompt.hidden = true;
-        destinations.focus({ preventScroll: true });
         destinations.click();
         return;
     }
@@ -206,16 +205,19 @@ function enterPlanet() {
 
 planet.addEventListener("click", enterPlanet);
 document.querySelectorAll(".planet-entry").forEach(entry => {
+    entry.addEventListener("pointerdown", event => {
+        if (event.button === 0 && document.activeElement === ship && !launching && demo.hidden) {
+            event.preventDefault()
+        }
+    });
     entry.addEventListener("click", event => {
         if (launching) {
             event.preventDefault();
             return;
         }
-
-        keys.clear();
-        vx = 0;
-        vy = 0;
-        ship.classList.remove("is-thrusting");
+        if (demo.hidden && ship.style.visibility === "visible") {
+            ship.focus({ preventScroll: true });
+        }
     });
 });
 function touchesPlanet(destination, width, height, sin, cos) {

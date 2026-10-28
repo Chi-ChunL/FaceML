@@ -182,6 +182,7 @@ a {
     box-sizing: border-box;
     margin: 0;
     padding: 12px 20px;
+    opacity: 0.75;
 
     background: rgba(22, 13, 38, 0.95);
     border: 2px solid #b591c6;
