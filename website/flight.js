@@ -38,8 +38,8 @@ const destinations = [
 
 const keys = new Set();
 const movementKeys = ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"];
-const speed = 400;
-const thrust = 200;
+const speed = 450;
+const thrust = 100;
 const drag = 0.1;
 const bounce = 0.6;
 const turnSpeed = 150;

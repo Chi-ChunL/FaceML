@@ -234,3 +234,34 @@ downloadCertificateButton.addEventListener("click", () => {
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     }, "image/png");
 });
+
+const musicButton = document.querySelector("#music-toggle");
+const backgroundMusic = new Audio(new URL("./assets/audio/space-ambient.mp3", import.meta.url).href);
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.2;
+backgroundMusic.preload = "none";
+
+musicButton.addEventListener("click", async () => {
+    musicButton.disabled = true;
+    try {
+        if (backgroundMusic.paused) {
+            await backgroundMusic.play();
+        } else {
+            backgroundMusic.pause();
+        }
+
+        musicButton.setAttribute("aria-pressed", String(!backgroundMusic.paused));
+        musicButton.title = backgroundMusic.paused ? "Play music" : "Pause music";
+    } catch (error) {
+        console.error("Music playback failed: ", error);
+        musicButton.title = "Music could not play. Try again.";
+    } finally {
+        musicButton.disabled = false;
+    }
+});
+
+musicButton.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        event.stopPropagation();
+    }
+});
