@@ -261,6 +261,8 @@ a {
 .demo-layout {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "camera expressions" "portrait expressions";
     gap: 24px;
     align-items: start;
     margin-top: 20px;
@@ -268,6 +270,16 @@ a {
 
 .camera-view {
     position: relative;
+    grid-area: camera;
+}
+
+.expression-panel {
+    grid-area: expressions;
+    padding: 16px;
+    background: #160d26;
+    border: 2px solid #47165a;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 #webcam,
@@ -301,8 +313,12 @@ a {
 }
 
 #live-prediction {
-    margin: 0 0 20px;
-    font-size: 24px;
+    margin: 0 0 16px;
+    padding: 12px;
+    font-size: 20px;
+    line-height: 1.3;
+    background: #2a1238;
+    border-left: 4px solid #b591c6;
 }
 
 .probability-row {
@@ -331,8 +347,22 @@ a {
 }
 
 @media (max-width: 760px) {
+    .camera-controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
     .demo-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto auto;
+        grid-template-areas: "camera" "expressions" "portrait";
+    }
+}
+
+@media (max-width: 480px) {
+    .project-card {
+        padding: 0;
+    }
+    .camera-controls .pixel-button {
+        font-size: 14px;
     }
 }
 #launch-flight {
@@ -346,7 +376,7 @@ a {
 
     font: inherit;
     color: #fffdf2;
-    background: transparent url("./assets/buttons/flashing-launch-sheet.png") 0 0 / 3072px 64px no-repeat;
+    background: transparent url("./assets/buttons/flashing-launch-Sheet.png") 0 0 / 3072px 64px no-repeat;
     image-rendering: pixelated;
     animation: launch-shine 4s steps(12, end) infinite;
 }
@@ -576,11 +606,12 @@ summary.planet-entry::-webkit-details-marker {
 }
 
 #astronaut-portrait {
+    grid-area: portrait;
     display: block;
-    width: 256px;
+    width: 128px;
     max-width: 100%;
     height: auto;
-    margin: 24px auto 0;
+    margin: 0 auto;
     image-rendering: pixelated;
 }
 
@@ -635,4 +666,17 @@ html {
     color: #fffdf2;
     border: 2px solid #8c5aa6;
     text-align: center;
+}
+
+.camera-controls {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.camera-controls .pixel-button {
+    width: 100%;
+    padding: 0 6px;
+    font-size: 18px;
+    white-space: nowrap;
 }

@@ -53,7 +53,7 @@ export function stopCamera() {
     const wasActive = Boolean(stream) || cameraStarting;
     cameraRequest += 1;
     faceContext.clearRect(0,0,48,48);
-    renderProbabilities(null, "Camera is off.");
+    renderProbabilities(null, "No expression yet.");
     window.clearInterval(detectionTimer);
     detectionTimer = null;
     overlayContext.clearRect(0, 0, overlay.width, overlay.height);
