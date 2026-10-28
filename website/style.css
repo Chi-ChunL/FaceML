@@ -587,3 +587,30 @@ summary.planet-entry::-webkit-details-marker {
 #astronaut-portrait[hidden] {
     display: none;
 }
+
+html {
+    overflow-anchor: none;
+}
+
+#deep-space {
+    height: 300vh;
+}
+
+#farewell {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 20px;
+    text-align: center;
+}
+
+#farewell h2,
+#farewell p {
+    max-width: 680px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+#farewell p {
+    color: #b591c6;
+}

@@ -4,6 +4,7 @@ const city = document.querySelector("#city");
 const planet = document.querySelector("#spaceml-planet");
 const demo = document.querySelector("#faceml-demo");
 const planetPrompt = document.querySelector("#planet-prompt");
+const deepSpace = document.querySelector("#deep-space");
 const destinations = [
     {
         element: planet,
@@ -243,6 +244,24 @@ function touchesPlanet(destination, width, height, sin, cos) {
     return false;
 }
 
+function extendSpace() {
+    if (document.body.classList.contains("is-loading") ||
+    launching ||
+    !demo.hidden ||
+    window.scrollY > window.innerHeight) return;
+
+    const extraHeight = window.innerHeight * 3;
+    const scrollBefore = window.scrollY;
+
+    deepSpace.style.height = `${deepSpace.offsetHeight + extraHeight}px`;
+    y += extraHeight;
+    ship.style.top = `${y}px`
+    window.scrollTo({
+        top: scrollBefore + extraHeight,
+        behavior: "instant",
+    });
+}
+
 function updateFlight(time) {
     const deltaTime = Math.min((time - previousTime) / 1000, 0.05);
     previousTime = time;
@@ -250,6 +269,8 @@ function updateFlight(time) {
         requestAnimationFrame(updateFlight);
         return;
     }
+
+    extendSpace();
 
     const right = keys.has("KeyD") || keys.has("ArrowRight");
     const left = keys.has("KeyA") || keys.has("ArrowLeft");
