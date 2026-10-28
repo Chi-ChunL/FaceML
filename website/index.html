@@ -56,6 +56,7 @@
                     <button id="upload-button" class="pixel-button" type="button">Upload image</button>
                     <button id="start-camera" class="pixel-button" disabled>Start Camera</button>
                     <button id="stop-camera" class="pixel-button" disabled>Stop</button>
+                    <button id="capture-portrait" class="pixel-button" type="button" disabled>Capture portrait</button>
                 </div>
                 <p id="status" role="status">Loading the model...</p>
                 <p id="camera-status">Camera is off.</p>
@@ -71,6 +72,7 @@
                         <div id="probability-bars"></div>
                     </section>
                 </div>
+                <canvas id="astronaut-portrait" width="128" height="128" aria-label="Your captured astronaut portrait" role="img" hidden></canvas>
                 <canvas id="face-crop" width="48" height="48" hidden></canvas>
                 <input id="image-upload" type="file" accept="image/*" hidden disabled>
 

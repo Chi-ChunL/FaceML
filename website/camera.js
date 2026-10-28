@@ -12,6 +12,13 @@ const faceCanvas = document.querySelector("#face-crop");
 const faceContext = faceCanvas.getContext("2d");
 const livePrediction = document.querySelector("#live-prediction");
 const preview = document.querySelector("#preview");
+const captureButton = document.querySelector("#capture-portrait");
+const portrait = document.querySelector("#astronaut-portrait")
+const portraitContext = portrait.getContext("2d");
+
+const spacesuit = new Image();
+spacesuit.src = new URL("./assets/mini-deco/spacesuit.png", import.meta.url).href;
+
 
 const probabilityRows = classNames.map(name => {
     const row = document.createElement("div");
@@ -38,8 +45,11 @@ let detectionBusy = false;
 let detectionTimer = null;
 let cameraRequest = 0;
 let cameraStarting = false;
+let latestFaceCrop = null;
 
 export function stopCamera() {
+    latestFaceCrop = null;
+    captureButton.disabled = true;
     const wasActive = Boolean(stream) || cameraStarting;
     cameraRequest += 1;
     faceContext.clearRect(0,0,48,48);
@@ -114,6 +124,9 @@ async function startCamera() {
         await video.play();
 
         if (request !== cameraRequest) return;
+        
+        video.width = video.videoWidth;
+        video.height = video.videoHeight;
 
         overlay.width = video.videoWidth;
         overlay.height = video.videoHeight;
@@ -153,6 +166,8 @@ async function detectFace() {
 
         overlayContext.clearRect(0, 0, overlay.width, overlay.height);
         if (faces.length === 0) {
+            latestFaceCrop = null;
+            captureButton.disabled = true;
             cameraStatus.textContent = "No face detected.";
             faceContext.clearRect(0,0,48,48);
             renderProbabilities(null, "No face detected.");
@@ -188,6 +203,8 @@ function predictDetectedFace(box) {
 
     const x = Math.max(0, Math.min(centerX - side / 2, video.videoWidth - side));
     const y = Math.max(0, Math.min(centerY - side / 2, video.videoHeight - side));
+    latestFaceCrop = { x, y, side };
+    captureButton.disabled = !spacesuit.complete || spacesuit.naturalWidth === 0;
     faceContext.drawImage(
         video,
         x, y, side, side,
@@ -219,3 +236,28 @@ startButton.addEventListener("click", startCamera);
 stopButton.addEventListener("click", stopCamera);
 window.addEventListener("pagehide", stopCamera);
 window.addEventListener("spaceml-exited", stopCamera);
+captureButton.addEventListener("click", () => {
+    if (
+        !latestFaceCrop || 
+        !stream ||
+        video.readyState < 2 ||
+        !spacesuit.naturalWidth
+    ) return;
+    const { x, y, side } = latestFaceCrop;
+    const cropHeight = side * 59 / 70;
+
+    portraitContext.clearRect(0, 0 , 128, 128);
+    portraitContext.save();
+    portraitContext.translate(98, 37);
+    portraitContext.scale(-1, 1);
+
+    portraitContext.drawImage(
+        video, x, y + (side - cropHeight) /2,
+        side, cropHeight,
+        0, 0 , 70, 59
+    );
+
+    portraitContext.restore()
+    portraitContext.drawImage(spacesuit, 0, 0, 128, 128);
+    portrait.hidden = false;
+});

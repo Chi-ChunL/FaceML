@@ -574,3 +574,16 @@ summary.planet-entry::-webkit-details-marker {
 #spaceml-planet:focus-visible {
     filter: drop-shadow(0 0 6px #b591c6);
 }
+
+#astronaut-portrait {
+    display: block;
+    width: 256px;
+    max-width: 100%;
+    height: auto;
+    margin: 24px auto 0;
+    image-rendering: pixelated;
+}
+
+#astronaut-portrait[hidden] {
+    display: none;
+}
