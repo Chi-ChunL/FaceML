@@ -27,11 +27,14 @@
     <section id="farewell" class="space-section">
         <h2>Thank you for visitng my website,</h2>
         <p>Feel free to explore the boundless space.</p>
+        <label for="certificate-name">Your explorer name</label>
+        <input id="certificate-name" type="text" maxlength="32" placeholder="Space Explorer">
         <button id="claim-certificate" class="pixel-button" type="button">
             Claim certificate
         </button>
         <p id="certificate-status" role="status">Capture your astronaut portrait in SpaceML first.</p>
         <canvas id="certificate-preview" width="768" height="512" role="img" aria-label="Your StarWeb certificate" hidden></canvas>
+        <button id="download-certificate" class="pixel-button" type="button" disabled>Download PNG</button>
     </section>
     <section id="socials" class="space-section personal-section">
         <h2>Find me in orbit</h2>

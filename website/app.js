@@ -14,9 +14,9 @@ const certificateContext = certificateCanvas.getContext("2d");
 const certificateStatus = document.querySelector("#certificate-status");
 const capturedPortrait = document.querySelector("#astronaut-portrait");
 const certificateBackground = new Image();
+const certificateName = document.querySelector("#certificate-name");
+const downloadCertificateButton = document.querySelector("#download-certificate");
 certificateBackground.src = new URL("./assets/mini-deco/certificate.png", import.meta.url).href;
-
-
 
 let model;
 
@@ -175,6 +175,7 @@ certificateButton.addEventListener("click", async () => {
     }
 
     certificateButton.disabled = true;
+    downloadCertificateButton.disabled = true;
 
     try {
         await certificateBackground.decode();
@@ -187,14 +188,49 @@ certificateButton.addEventListener("click", async () => {
         certificateContext.font = "32px Pixelify Sans";
         certificateContext.textAlign = "center";
         certificateContext.textBaseline = "middle";
-        certificateContext.fillText("Space Explorer", 384, 292);
+        const explorerName = certificateName.value.trim() || "Space Explorer";
+
+        certificateContext.fillText(explorerName, 384, 292, 600);
         certificateContext.drawImage(capturedPortrait, 32, 352, 128, 128);
         certificateCanvas.hidden = false;
-        certificateStatus.textContent = "Certified by StarWeb";
+        downloadCertificateButton.disabled = false;
+        certificateStatus.textContent = "Certified by StarWeb.";
     } catch (error) {
         console.error(error);
         certificateStatus.textContent = "The certificate couldnt be created.";
     } finally {
         certificateButton.disabled = false;
     }
+});
+
+certificateName.addEventListener("input", () => {
+    downloadCertificateButton.disabled = true;
+});
+
+downloadCertificateButton.addEventListener("click", () => {
+    if (certificateCanvas.hidden || downloadCertificateButton.disabled) return;
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = certificateCanvas.width * 2;
+    exportCanvas.height = certificateCanvas.height * 2;
+
+    const exportContext = exportCanvas.getContext("2d");
+    exportContext.imageSmoothingEnabled = false;
+    exportContext.drawImage(certificateCanvas, 0, 0, exportCanvas.width, exportCanvas.height);
+    exportCanvas.toBlob(blob => {
+        if(!blob) {
+            certificateStatus.textContent = "PNG  couldnt be created"; 
+            return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "StarWeb-certificate.png";
+        link.hidden = true;
+
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, "image/png");
 });

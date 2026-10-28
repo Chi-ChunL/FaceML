@@ -406,6 +406,7 @@ window.addEventListener("spaceml-exited", () =>{
 });
 
 window.addEventListener("keydown", event => {
+    if (event.target instanceof Element && event.target.closest("#certificate-name, #claim-certificate, #download-certificate")) return;
     if (event.key !== "Enter" || event.repeat || event.defaultPrevented) return;
     if (event.ctrlKey || event.metaKey || event.altKey) return;
     if (launching || !demo.hidden || ship.style.visibility !== "visible") return;

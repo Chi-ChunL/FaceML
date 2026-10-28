@@ -626,3 +626,13 @@ html {
 #certificate-preview[hidden] {
     display: none;
 }
+
+#certificate-name {
+    width: min(320px, 100%);
+    box-sizing: border-box;
+    padding: 10px;
+    background: #160d26;
+    color: #fffdf2;
+    border: 2px solid #8c5aa6;
+    text-align: center;
+}
